@@ -18,15 +18,18 @@ body,html{
 
 .pimg1{
   background-image: url('assorted-beauty-blur-457702.jpg');
-  min-height:100%
+  min-height:100%;
+    width:100%;
 }
 .pimg2{
   background-image: url('pexels-photo-674268.jpeg');
-  min-height:100%
+  min-height:100%;
+  width:100%;
 }
 .pimg3{
   background-image: url('apple-coffee-couch-6666.jpg');
-  min-height:100%
+  min-height:100%;
+  width:100%;
 }
 
 .section{
