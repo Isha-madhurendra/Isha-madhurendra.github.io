@@ -18,18 +18,17 @@ body,html{
 
 .pimg1{
   background-image: url('assorted-beauty-blur-457702.jpg');
-  min-height:100%
-   
+  width:100%;
+  height:auto;
+
 }
 .pimg2{
   background-image: url('pexels-photo-674268.jpeg');
   min-height:100%
- 
 }
 .pimg3{
   background-image: url('apple-coffee-couch-6666.jpg');
   min-height:100%
-  
 }
 
 .section{
@@ -65,8 +64,7 @@ body,html{
   background-color:transparent;
 }
 @media only screen and(max-width:568px){
-  .pimg1, .pimg2, .pimg3{
+  .pimg1, .pimg2, .pimg3,body{
     background-attachment:scroll;
   }
 }
-
