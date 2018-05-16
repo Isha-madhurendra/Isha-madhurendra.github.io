@@ -63,6 +63,10 @@ body,html{
 .ptext .border.trans{
   background-color:transparent;
 }
+.footer{
+  background-color:#282e34;
+  color:#ddd;
+}
 @media only screen and(max-width:568px){
   .pimg1, .pimg2, .pimg3,body{
     background-attachment:scroll;
