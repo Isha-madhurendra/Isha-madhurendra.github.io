@@ -1,94 +1,644 @@
 <!DOCTYPE html>
-<html>
- <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,inital-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isha — AI Engineer & Data Scientist</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0908;
+  --surface:#111009;
+  --card:#16140f;
+  --accent:#e8a020;
+  --accent2:#c45c2e;
+  --teal:#2a9d8f;
+  --ink:#f0ebe0;
+  --muted:#6b6456;
+  --border:rgba(232,160,32,0.15);
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Space Mono',monospace;
+  background:var(--bg);
+  color:var(--ink);
+  overflow-x:hidden;
+  cursor:none;
+}
 
-<title>MYWEBSITE</title>
-<link rel="stylesheet" href="style.css">
+/* CUSTOM CURSOR */
+#cursor{
+  position:fixed;width:12px;height:12px;
+  background:var(--accent);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transition:transform 0.1s,opacity 0.2s;
+  mix-blend-mode:difference;
+}
+#cursor-trail{
+  position:fixed;width:40px;height:40px;
+  border:1px solid rgba(232,160,32,0.4);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transition:left 0.12s ease,top 0.12s ease,transform 0.3s;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.2rem 3rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,9,8,0.8);
+  backdrop-filter:blur(20px);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem;letter-spacing:0.15em;color:var(--accent);
+}
+.nav-links{display:flex;gap:2.5rem;list-style:none;}
+.nav-links a{
+  text-decoration:none;color:var(--muted);
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  transition:color 0.2s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;
+  background:var(--accent);transform:scaleX(0);transition:transform 0.2s;
+}
+.nav-links a:hover{color:var(--accent);}
+.nav-links a:hover::after{transform:scaleX(1);}
+
+/* CANVAS */
+#bg-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 3.5rem;padding-top:80px;
+  position:relative;z-index:1;
+}
+.hero-eyebrow{
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--accent);}
+.hero-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(5rem,12vw,11rem);
+  line-height:0.9;font-weight:700;
+  margin-bottom:1.5rem;
+}
+.hero-name .line2{
+  font-style:italic;color:transparent;
+  -webkit-text-stroke:1px var(--accent);
+  display:block;
+}
+.hero-name .line3{
+  display:block;color:var(--ink);font-size:0.45em;
+  font-weight:400;letter-spacing:0.3em;text-transform:uppercase;
+  font-family:'Space Mono',monospace;margin-top:0.5rem;
+}
+.hero-desc{
+  max-width:480px;font-size:0.82rem;color:var(--muted);
+  line-height:1.9;margin-bottom:3rem;
+  border-left:2px solid var(--accent);padding-left:1.5rem;
+}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn{
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  padding:1rem 2.2rem;cursor:none;text-decoration:none;
+  transition:all 0.25s;display:inline-block;
+}
+.btn-primary{
+  background:var(--accent);color:var(--bg);font-weight:700;
+  border:1px solid var(--accent);
+}
+.btn-primary:hover{background:transparent;color:var(--accent);}
+.btn-outline{
+  background:transparent;color:var(--ink);
+  border:1px solid rgba(240,235,224,0.2);
+}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+.hero-scroll{
+  position:absolute;bottom:2.5rem;right:3.5rem;
+  font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:0.8rem;
+}
+.hero-scroll::after{
+  content:'';display:block;width:1px;height:60px;
+  background:linear-gradient(to bottom,var(--muted),transparent);
+}
+
+/* MARQUEE */
+.marquee-wrap{
+  overflow:hidden;border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:var(--surface);padding:1rem 0;position:relative;z-index:1;
+}
+.marquee-track{
+  display:flex;width:max-content;
+  animation:marquee 20s linear infinite;
+}
+.marquee-item{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.4rem;letter-spacing:0.15em;
+  padding:0 2rem;color:var(--muted);
+  white-space:nowrap;
+}
+.marquee-item span{color:var(--accent);}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+section.content{
+  position:relative;z-index:1;
+  padding:6rem 3.5rem;
+}
+.s-label{
+  font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:0.5rem;
+  display:flex;align-items:center;gap:0.8rem;
+}
+.s-label::before{content:'[ ';} .s-label::after{content:' ]';}
+.s-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  font-style:italic;line-height:1.1;margin-bottom:3.5rem;
+}
+
+/* ABOUT */
+.about-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;}
+.about-text p{
+  font-size:0.82rem;color:var(--muted);line-height:2;
+  margin-bottom:1.2rem;
+}
+.about-text strong{color:var(--ink);font-weight:700;}
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:2rem;background:var(--border);}
+.stat{
+  background:var(--bg);padding:2rem 1.5rem;
+  border:1px solid var(--border);
+}
+.stat-n{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.5rem;color:var(--accent);line-height:1;letter-spacing:0.05em;
+}
+.stat-l{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.3rem;}
+
+/* EXPERIENCE */
+.exp-scroll{overflow-x:auto;padding-bottom:1.5rem;}
+.exp-scroll::-webkit-scrollbar{height:2px;}
+.exp-scroll::-webkit-scrollbar-track{background:var(--surface);}
+.exp-scroll::-webkit-scrollbar-thumb{background:var(--accent);}
+.exp-track{display:flex;gap:1.5rem;width:max-content;}
+.exp-card{
+  width:320px;flex-shrink:0;
+  border:1px solid var(--border);
+  background:var(--card);padding:2rem;
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s,transform 0.3s;
+}
+.exp-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent);transform:scaleX(0);transform-origin:left;
+  transition:transform 0.4s ease;
+}
+.exp-card:hover::before{transform:scaleX(1);}
+.exp-card:hover{border-color:rgba(232,160,32,0.4);transform:translateY(-4px);}
+.exp-num{
+  font-family:'Bebas Neue',sans-serif;font-size:5rem;
+  color:rgba(232,160,32,0.08);position:absolute;
+  top:-0.5rem;right:1rem;line-height:1;pointer-events:none;
+}
+.exp-period{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:0.8rem;}
+.exp-company{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:0.3rem;}
+.exp-role{font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;margin-bottom:1.2rem;}
+.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:0.6rem;}
+.exp-bullets li{
+  font-size:0.72rem;color:var(--muted);line-height:1.6;
+  padding-left:1rem;position:relative;
+}
+.exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--accent);}
+
+/* SKILLS */
+.skills-bg{background:var(--surface);}
+.skills-cloud{display:flex;flex-wrap:wrap;gap:0.8rem;}
+.skill-pill{
+  font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:0.6rem 1.2rem;border:1px solid var(--border);
+  color:var(--muted);transition:all 0.25s;cursor:none;
+  position:relative;overflow:hidden;
+}
+.skill-pill::before{
+  content:'';position:absolute;inset:0;
+  background:var(--accent);transform:translateY(100%);
+  transition:transform 0.25s ease;z-index:0;
+}
+.skill-pill span{position:relative;z-index:1;}
+.skill-pill:hover{color:var(--bg);border-color:var(--accent);}
+.skill-pill:hover::before{transform:translateY(0);}
+.skill-pill.big{font-size:0.85rem;padding:0.8rem 1.6rem;}
+.skill-pill.sm{font-size:0.6rem;padding:0.45rem 0.9rem;}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);}
+.proj-card{
+  background:var(--bg);padding:2.5rem;
+  transition:background 0.3s;position:relative;overflow:hidden;
+  cursor:none;
+}
+.proj-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(232,160,32,0.06) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.proj-card:hover::after{opacity:1;}
+.proj-card:hover{background:var(--card);}
+.proj-type{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;}
+.proj-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-style:italic;margin-bottom:1rem;line-height:1.2;}
+.proj-desc{font-size:0.75rem;color:var(--muted);line-height:1.8;margin-bottom:1.5rem;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.proj-tag{
+  font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;
+  padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--muted);
+}
+.proj-arrow{
+  position:absolute;bottom:2rem;right:2rem;
+  font-size:1.5rem;color:rgba(232,160,32,0.15);
+  transition:color 0.3s,transform 0.3s;
+}
+.proj-card:hover .proj-arrow{color:var(--accent);transform:translate(4px,-4px);}
+
+/* CONTACT */
+.contact-section{background:var(--surface);text-align:center;}
+.contact-email{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.5rem,7vw,6rem);
+  letter-spacing:0.1em;color:transparent;
+  -webkit-text-stroke:1px var(--muted);
+  transition:color 0.3s,-webkit-text-stroke 0.3s;
+  cursor:none;display:inline-block;margin:2rem 0 3rem;
+  text-decoration:none;
+}
+.contact-email:hover{color:var(--accent);-webkit-text-stroke:1px var(--accent);}
+.social-row{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;}
+.social-link{
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  padding:0.8rem 1.5rem;border:1px solid var(--border);
+  transition:all 0.2s;cursor:none;
+}
+.social-link:hover{color:var(--accent);border-color:var(--accent);}
+
+footer{
+  position:relative;z-index:1;
+  background:var(--bg);border-top:1px solid var(--border);
+  padding:1.5rem 3.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-txt{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.footer-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+</style>
 </head>
 <body>
-  <div class="pimg1">
-    <div class="ptext">
-      <span class="border">
-        BEAUTY
-      </span>
+
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <div class="nav-logo">Isha</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Work</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">AI Engineer · Data Scientist · Artist</p>
+  <h1 class="hero-name">
+    Isha
+    <span class="line2">builds.</span>
+    <span class="line3">San Francisco · Open to Work</span>
+  </h1>
+  <p class="hero-desc">
+    I build AI agents, RAG systems, and full-stack apps that solve real problems.
+    I also make comics, oil paintings, and digital art. The two aren't as different as you'd think.
+  </p>
+  <div class="hero-cta">
+    <a href="#projects" class="btn btn-primary">See My Work</a>
+    <a href="#contact" class="btn btn-outline">Say Hello</a>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">LangGraph <span>✦</span></span>
+    <span class="marquee-item">RAG Systems <span>✦</span></span>
+    <span class="marquee-item">FastAPI <span>✦</span></span>
+    <span class="marquee-item">React <span>✦</span></span>
+    <span class="marquee-item">Climate Tech <span>✦</span></span>
+    <span class="marquee-item">Healthcare AI <span>✦</span></span>
+    <span class="marquee-item">Cornell MPS <span>✦</span></span>
+    <span class="marquee-item">Novartis <span>✦</span></span>
+    <span class="marquee-item">Comics &amp; Painting <span>✦</span></span>
+    <span class="marquee-item">LangGraph <span>✦</span></span>
+    <span class="marquee-item">RAG Systems <span>✦</span></span>
+    <span class="marquee-item">FastAPI <span>✦</span></span>
+    <span class="marquee-item">React <span>✦</span></span>
+    <span class="marquee-item">Climate Tech <span>✦</span></span>
+    <span class="marquee-item">Healthcare AI <span>✦</span></span>
+    <span class="marquee-item">Cornell MPS <span>✦</span></span>
+    <span class="marquee-item">Novartis <span>✦</span></span>
+    <span class="marquee-item">Comics &amp; Painting <span>✦</span></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="content" id="about">
+  <p class="s-label">About</p>
+  <h2 class="s-title">Engineer, analyst,<br>and occasional artist.</h2>
+  <div class="about-layout">
+    <div class="about-text">
+      <p>I'm an AI Engineer and Data Scientist who builds things that work in the real world — not just in demos. My stack spans <strong>LangGraph agents</strong>, full-stack apps (FastAPI + React), and large-scale data pipelines.</p>
+      <p>Before AI engineering, I spent 2.5 years at <strong>Novartis</strong> working with healthcare claims and EHR data across 300+ payors. I hold a <strong>Master's from Cornell</strong> (AI/ML focus, 3.98 GPA) where I built a RAG assistant handling 500+ daily queries.</p>
+      <p>When I'm not writing code, I'm drawing comics, painting in oils, or making digital art. I think the best engineers are also creative thinkers — systems design and visual composition aren't so different.</p>
+    </div>
+    <div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-n">2.5+</div><div class="stat-l">Years in AI & Data</div></div>
+        <div class="stat"><div class="stat-n">500+</div><div class="stat-l">Daily RAG queries</div></div>
+        <div class="stat"><div class="stat-n">300+</div><div class="stat-l">Payors analyzed</div></div>
+        <div class="stat"><div class="stat-n">3.98</div><div class="stat-l">Cornell GPA</div></div>
+      </div>
     </div>
   </div>
-
-  <section class="section section-light">
-    <h2>Discovering Your Inner Beauty</h2>
-    <p>It's common for people to go to great lengths and expense in the pursuit of beauty. Cosmetics, fashion and even the medical industry vie for your attention and dollars. There are a million ways to enhance your physical beauty. How much will it cost? Will you ever be satisfied? Will you really feel more beautiful? Following are a series of suggestions that offer a holistic and spiritual approach to the more beautiful you.
-
-They say beauty is in the eye of the beholder. You may be a brunette with an eye on a guy who only likes blondes. The Kayan Lahwi tribe in Thailand reveres women with elongated necks, stretched with brass rings over a lifetime. There are plenty of people who believe Jersey Shore girls have got it going on while others like classic, elegant and understated or conservative style. An endless array of looks and levels of style live in between extremes. External beauty is widely interpreted. It's helpful to accept that, based on this, you will never be beautiful to everyone. A standard of physical beauty across all cultures is nonexistent.
-
-But the definition of interior beauty is universal. A good heart and a kind soul always trumps a dark and brooding nature. Who do you prefer to spend time with? Someone who laughs or someone who complains? What do you project to friends, family and the world? The expression of your heart and soul is as obvious as your freshly shellacked fingernails and little black dress.
-
-Check your watch. The time is now. The past is over and tomorrow may never come. All that you have and all that you can control is right here and right now. You can choose to be beautiful and let our beauty tips put roses in your cheeks and lightness in your step. You do not need a day spa to feel beautiful today.
-
-To be truly beautiful, you must first open your eyes and invite beauty into your life. Every moment offers a choice. With so many pressures upon us, we are easily distracted. Text messages fly fast. Phones ring and emails pile up. Your eyes are dry from staring at glowing screens of smart phones, laptops, desktops and tablets. Look up and unplug - the world can change. Beauty is free, but with a catch. Beauty is an invitation you must accept. Open your eyes and your heart and welcome beauty into your life. Just listen to you.
-</p>
-</section>
-<div class="pimg2">
-  <div class="ptext">
-    <span class="border trans">
-      TRAVEL
-    </span>
-  </div>
-</div>
-  <section class="section section-dark">
-    <h2>Travel for your mind and body's health</h2>
-    <p>Vacation and relaxation go hand-in-hand. Everyone needs time away from the office to rejuvenate. Studies show travel does reduce stress. It also improves our ability to handle stress long after we return home. Studies also show decreased stress in travelers had lower levels of stress hormones.
-
-The benefits of travel and the resulting traveler’s high extend into the workplace as well. Employees who travel have lower rates of absenteeism, higher productivity levels, and generally report feeling less burnt out.
-
-Travel is a learning experience. The new cultures, cuisines, sights, and sounds provide countless opportunities to experience and learn something new. Just being in another country increases the traveler’s knowledge and intercultural awareness.
-
-Travel also helps students learn more. Studies show students who travel earn better grades than their peers who stay at home. These students also have stronger academic interests and more personal confidence. Students who travel abroad are almost twice as likely to complete a college degree.
-Travel has been linked to a lower risk of heart disease. A nine-year study of 12,000 men found that those who took at least one vacation per year were 30% less likely to die from heart disease. Another study showed individuals who didn’t take a vacation were twice as likely to have a heart attack.
-
-Travel is also linked to a lower risk of depression. A 2005 study showed significantly decreased risk of depression among 15,000 women.
-</p>
 </section>
 
-<div class="pimg3">
-  <div class="ptext">
-    <span class="border trans">
-      LIFESTYLE
-    </span>
+<!-- EXPERIENCE -->
+<section class="content" id="experience" style="padding-bottom:3rem;">
+  <p class="s-label">Experience</p>
+  <h2 class="s-title">Where I've built things.</h2>
+  <div class="exp-scroll">
+    <div class="exp-track">
+      <div class="exp-card">
+        <div class="exp-num">01</div>
+        <div class="exp-period">2024 – 2025</div>
+        <div class="exp-company">Knudsen.Earth</div>
+        <div class="exp-role">AI Engineer · Full Stack</div>
+        <ul class="exp-bullets">
+          <li>Built LangGraph multi-agent systems for climate tech clients</li>
+          <li>Primary technical client contact, led all AI deliverables</li>
+          <li>Full-stack with FastAPI, React/TypeScript, PostgreSQL</li>
+          <li>AIS pipelines to track active fishing vessels in real time</li>
+          <li>ML models for tow prediction & permit approval probability</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <div class="exp-num">02</div>
+        <div class="exp-period">2022 – 2024</div>
+        <div class="exp-company">Novartis</div>
+        <div class="exp-role">Business Data Analyst</div>
+        <ul class="exp-bullets">
+          <li>Analyzed claims & EHR data across 300+ healthcare payors</li>
+          <li>Built pipelines processing millions of patient records</li>
+          <li>Dashboards and reports shaping formulary decisions</li>
+          <li>Stakeholder-facing analytics across cross-functional teams</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <div class="exp-num">03</div>
+        <div class="exp-period">2022 – 2023</div>
+        <div class="exp-company">Cornell University</div>
+        <div class="exp-role">Graduate Researcher · NLP</div>
+        <ul class="exp-bullets">
+          <li>Built a RAG virtual assistant deployed campus-wide</li>
+          <li>Handled 500+ daily student inquiries via semantic search</li>
+          <li>Designed retrieval pipeline using vector embeddings</li>
+          <li>GPA: 3.98 · MPS in Information Science (AI/ML)</li>
+        </ul>
+      </div>
+    </div>
   </div>
-</div>
-<section class="section section-dark">
-  <h2>Love Yourself enough to lead a healthy lifestyle</h2>
-  <p> Living a healthy lifestyle may mean something different from one person to the next. For some, health is defined by living a disease-free life. For others, healthy is being able to play with grandchildren or perhaps adhering to a weekly exercise schedule. Though the definition of healthy may differ between people, living a healthy lifestyle is a fundamental component to achieving your optimal mental and physical well-being.An inactive lifestyle is a prominent cause for chronic diseases. Fortunately, many of these conditions are manageable and can be prevented by engaging in physical activity most days of the week and by being mindful of your food and lifestyle choices. Your diet also impacts your risk of developing diabetes. In a hallmark 16-year study published in March 2001 by "The New England Journal of Medicine," participants who maintained a body mass index of 25 or less were found to have a significantly lower risk for developing type 2 diabetes compared to people with higher BMIs. Diets high in saturated fat, sugar and processed foods will quickly lead to added pounds. Being overweight increases your risk for high blood pressure, arthritis and certain forms of cancer.
-
-Focusing on a healthy lifestyle not only improves your quality of life, but it may add years as well. Authors of a June 2002 article published by the "American Journal of Public Health" concluded that smoking cessation before age 35 adds 6 to 8 years of life, while quitting at age 65 still adds 1 to 4 years of life expectancy. Being mindful of your diet, physical activity and stress levels allows you to effectively balance all aspects of your life and might increase your life span. Maintaining regular physical examinations aids with early detection and treatment of medical conditions. In addition, your doctor can recommend lifestyle habits that contribute to a longer and healthier life.Learning how to effectively deal with stress plays a significant role in maintaining your health. In a September 2012 article published by "Computational and Mathematical Methods in Medicine," the authors concluded that leading a healthy lifestyle by engaging in regular physical activity and eating a balanced diet promotes low levels of stress, especially in women. Finding ways to release anxiety and handle daily pressures can keep stress levels low. Some people find participating in yoga or breathing techniques each morning helps them mentally prepare for the day ahead. Spending a few minutes in thoughtful reflection before going to bed may help improve your quality of sleep. And regular exercise increases your brain's ability to memorize and learn.</p>
 </section>
-<div class="pimg1">
-  <div class="ptext">
-    <span class="border">
-      GLITTERATI
-    </span>
+
+<!-- SKILLS -->
+<section class="content skills-bg" id="skills">
+  <p class="s-label">Skills</p>
+  <h2 class="s-title">What I reach for.</h2>
+  <div class="skills-cloud">
+    <div class="skill-pill big"><span>LangGraph</span></div>
+    <div class="skill-pill big"><span>RAG</span></div>
+    <div class="skill-pill"><span>LangChain</span></div>
+    <div class="skill-pill big"><span>Python</span></div>
+    <div class="skill-pill"><span>FastAPI</span></div>
+    <div class="skill-pill sm"><span>Embeddings</span></div>
+    <div class="skill-pill big"><span>React</span></div>
+    <div class="skill-pill"><span>TypeScript</span></div>
+    <div class="skill-pill sm"><span>PostgreSQL</span></div>
+    <div class="skill-pill"><span>SQL</span></div>
+    <div class="skill-pill big"><span>Prompt Engineering</span></div>
+    <div class="skill-pill sm"><span>Snowflake</span></div>
+    <div class="skill-pill"><span>Pandas</span></div>
+    <div class="skill-pill"><span>Scikit-learn</span></div>
+    <div class="skill-pill sm"><span>Docker</span></div>
+    <div class="skill-pill"><span>AWS</span></div>
+    <div class="skill-pill sm"><span>EHR Data</span></div>
+    <div class="skill-pill"><span>Statistical Modeling</span></div>
+    <div class="skill-pill sm"><span>Tableau</span></div>
+    <div class="skill-pill big"><span>Node.js</span></div>
+    <div class="skill-pill sm"><span>dbt</span></div>
+    <div class="skill-pill"><span>Semantic Search</span></div>
+    <div class="skill-pill sm"><span>Vector DBs</span></div>
+    <div class="skill-pill"><span>Fine-tuning</span></div>
   </div>
-</div>
-<div class="footer">
-  <h4>Contact us on:</h4>
-<a href="https://twitter.com">
-<img title="Twitter" alt="Twitter" src="https://socialmediawidgets.files.wordpress.com/2014/03/01_twitter.png" width="35" height="35" />
-</a>
-<a href="https://www.pinterest.com">
-<img title="Pinterest" alt="Pinterest" src="https://socialmediawidgets.files.wordpress.com/2014/03/13_pinterest.png" width="35" height="35" />
-</a>
-<a href="https://www.facebook.com">
-<img title="Facebook" alt="Facebook" src="https://socialmediawidgets.files.wordpress.com/2014/03/02_facebook.png" width="35" height="35" />
-</a>
-<a href="https://www.linkedin.com">
-<img title="LinkedIn" alt="LinkedIn" src="https://socialmediawidgets.files.wordpress.com/2014/03/07_linkedin.png" width="35" height="35" />
-</a>
-<a href="https://www.instagram.com">
-<img title="Instagram" alt="RSS" src="https://socialmediawidgets.files.wordpress.com/2014/03/10_instagram.png" width="35" height="35" />
-</a>
-</div>
+</section>
+
+<!-- PROJECTS -->
+<section class="content" id="projects">
+  <p class="s-label">Projects</p>
+  <h2 class="s-title">Things I've shipped.</h2>
+  <div class="proj-grid">
+    <div class="proj-card" onmousemove="trackMouse(event,this)">
+      <div class="proj-type">AI Agents · Climate Tech</div>
+      <div class="proj-title">Fishing Intelligence System</div>
+      <div class="proj-desc">Multi-agent LangGraph system analyzing AIS vessel data to track active scallop fishers using speed profiles, port distance, and Days-at-Sea regulations.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">LangGraph</span>
+        <span class="proj-tag">Python</span>
+        <span class="proj-tag">AIS Data</span>
+        <span class="proj-tag">PostgreSQL</span>
+      </div>
+      <div class="proj-arrow">↗</div>
+    </div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)">
+      <div class="proj-type">RAG · NLP</div>
+      <div class="proj-title">University Virtual Assistant</div>
+      <div class="proj-desc">RAG-powered assistant deployed at Cornell handling 500+ daily student queries. Built custom retrieval pipeline with semantic search and vector embeddings.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">RAG</span>
+        <span class="proj-tag">LangChain</span>
+        <span class="proj-tag">Vector DB</span>
+        <span class="proj-tag">React</span>
+      </div>
+      <div class="proj-arrow">↗</div>
+    </div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)">
+      <div class="proj-type">Geospatial · Statistics</div>
+      <div class="proj-title">Scallop Survey Analysis</div>
+      <div class="proj-desc">Statistical comparison of 4 survey platforms (NOAA dredge, HabCam, V1/V2 AUV) using variograms, CV calculations, and cost-accuracy tradeoff curves.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">Python</span>
+        <span class="proj-tag">Geostatistics</span>
+        <span class="proj-tag">Variograms</span>
+      </div>
+      <div class="proj-arrow">↗</div>
+    </div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)">
+      <div class="proj-type">Healthcare · Analytics</div>
+      <div class="proj-title">Claims & EHR Platform</div>
+      <div class="proj-desc">Enterprise analytics across 300+ healthcare payors at Novartis. Pipelines, dashboards, and insights driving formulary and market access decisions.</div>
+      <div class="proj-tags">
+        <span class="proj-tag">SQL</span>
+        <span class="proj-tag">Snowflake</span>
+        <span class="proj-tag">Tableau</span>
+        <span class="proj-tag">Python</span>
+      </div>
+      <div class="proj-arrow">↗</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="content contact-section" id="contact">
+  <p class="s-label">Contact</p>
+  <h2 class="s-title" style="text-align:center;">Let's make<br>something.</h2>
+  <div style="text-align:center;">
+    <!-- TODO: Replace with your real email -->
+    <a href="mailto:im386@cornell.edu" class="contact-email">im386@cornell.edu</a>
+  </div>
+  <div class="social-row">
+    <!-- TODO: Replace # with your real URLs -->
+    <a href="https://github.com/Isha-madhurendra" class="social-link">GitHub</a>
+    <a href="https://linkedin.com/in/isha-madhurendra999" class="social-link">LinkedIn</a>
+    <a href="/resume.pdf" class="social-link">Resume</a>
+    <a href="#" class="social-link">Art Portfolio</a>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-txt">© 2025 Isha · Built from scratch</span>
+  <div class="footer-dot"></div>
+  <span class="footer-txt">San Francisco, CA</span>
+</footer>
+
+<script>
+// CUSTOM CURSOR
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=(mx-6)+'px';
+  cursor.style.top=(my-6)+'px';
+});
+setInterval(()=>{
+  tx+=(mx-tx)*0.15; ty+=(my-ty)*0.15;
+  trail.style.left=(tx-20)+'px';
+  trail.style.top=(ty-20)+'px';
+},16);
+document.querySelectorAll('a,.btn,.skill-pill,.proj-card,.exp-card,.contact-email,.social-link').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform='scale(2.5)';
+    trail.style.transform='scale(0.5)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.transform='scale(1)';
+    trail.style.transform='scale(1)';
+  });
+});
+
+// CANVAS PARTICLE FIELD
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize(); window.addEventListener('resize',resize);
+
+class Particle{
+  constructor(){this.reset();}
+  reset(){
+    this.x=Math.random()*W; this.y=Math.random()*H;
+    this.vx=(Math.random()-0.5)*0.3; this.vy=(Math.random()-0.5)*0.3;
+    this.r=Math.random()*1.5+0.3;
+    this.alpha=Math.random()*0.4+0.05;
+    this.color=Math.random()>0.85?'232,160,32':'240,235,224';
+  }
+  update(){
+    this.x+=this.vx; this.y+=this.vy;
+    const dx=this.x-mx, dy=this.y-my;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120){
+      const force=(120-dist)/120;
+      this.x+=dx/dist*force*2;
+      this.y+=dy/dist*force*2;
+    }
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${this.color},${this.alpha})`;
+    ctx.fill();
+  }
+}
+for(let i=0;i<120;i++) particles.push(new Particle());
+
+function drawConnections(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(232,160,32,${0.06*(1-d/100)})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  drawConnections();
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(animate);
+}
+animate();
+
+// PROJECT CARD MOUSE GLOW
+function trackMouse(e,card){
+  const rect=card.getBoundingClientRect();
+  const x=((e.clientX-rect.left)/rect.width*100).toFixed(1);
+  const y=((e.clientY-rect.top)/rect.height*100).toFixed(1);
+  card.style.setProperty('--mx',x+'%');
+  card.style.setProperty('--my',y+'%');
+}
+</script>
 </body>
 </html>
