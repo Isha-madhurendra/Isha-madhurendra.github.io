@@ -3,642 +3,555 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Isha — AI Engineer & Data Scientist</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<title>Isha — AI Engineer</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#0a0908;
-  --surface:#111009;
-  --card:#16140f;
-  --accent:#e8a020;
-  --accent2:#c45c2e;
-  --teal:#2a9d8f;
-  --ink:#f0ebe0;
-  --muted:#6b6456;
-  --border:rgba(232,160,32,0.15);
+  --bg:#07080f;--surface:#0c0d18;--card:#10111e;
+  --pink:#e040a0;--blue:#3af0f0;
+  --ink:#f0eeff;--muted:#5a5a7a;
+  --border:rgba(58,240,240,0.12);
 }
-html{scroll-behavior:smooth;}
+html{scroll-behavior:auto;}
 body{
-  font-family:'Space Mono',monospace;
-  background:var(--bg);
-  color:var(--ink);
-  overflow-x:hidden;
-  cursor:none;
+  font-family:'Satoshi',sans-serif;
+  background:var(--bg);color:var(--ink);
+  overflow-x:hidden;cursor:none;
+  /* smooth scroll wrapper */
+  height:100vh;overflow:hidden;
 }
-
-/* CUSTOM CURSOR */
-#cursor{
-  position:fixed;width:12px;height:12px;
-  background:var(--accent);border-radius:50%;
-  pointer-events:none;z-index:9999;
-  transition:transform 0.1s,opacity 0.2s;
-  mix-blend-mode:difference;
+#scroll-container{
+  position:fixed;top:0;left:0;width:100%;
+  will-change:transform;
 }
-#cursor-trail{
-  position:fixed;width:40px;height:40px;
-  border:1px solid rgba(232,160,32,0.4);
-  border-radius:50%;pointer-events:none;z-index:9998;
-  transition:left 0.12s ease,top 0.12s ease,transform 0.3s;
-}
-
-/* NAV */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:1.2rem 3rem;
-  border-bottom:1px solid var(--border);
-  background:rgba(10,9,8,0.8);
-  backdrop-filter:blur(20px);
-}
-.nav-logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.8rem;letter-spacing:0.15em;color:var(--accent);
-}
-.nav-links{display:flex;gap:2.5rem;list-style:none;}
-.nav-links a{
-  text-decoration:none;color:var(--muted);
-  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
-  transition:color 0.2s;position:relative;
-}
-.nav-links a::after{
-  content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;
-  background:var(--accent);transform:scaleX(0);transition:transform 0.2s;
-}
-.nav-links a:hover{color:var(--accent);}
+#cursor{position:fixed;width:12px;height:12px;background:var(--pink);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:difference;}
+#cursor-trail{position:fixed;width:40px;height:40px;border:1px solid rgba(58,240,240,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:left 0.12s ease,top 0.12s ease,transform 0.3s;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;border-bottom:1px solid var(--border);background:rgba(7,8,15,0.85);backdrop-filter:blur(20px);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.15em;background:linear-gradient(90deg,var(--blue),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;transition:color 0.2s;position:relative;font-family:'Satoshi',sans-serif;font-weight:500;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--blue);transform:scaleX(0);transition:transform 0.2s;}
+.nav-links a:hover{color:var(--blue);}
 .nav-links a:hover::after{transform:scaleX(1);}
-
-/* CANVAS */
-#bg-canvas{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  z-index:0;pointer-events:none;
-}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 
 /* HERO */
-.hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:0 3.5rem;padding-top:80px;
-  position:relative;z-index:1;
-}
-.hero-eyebrow{
-  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:1.5rem;
-  display:flex;align-items:center;gap:1rem;
-}
-.hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--accent);}
-.hero-name{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(5rem,12vw,11rem);
-  line-height:0.9;font-weight:700;
-  margin-bottom:1.5rem;
-}
-.hero-name .line2{
-  font-style:italic;color:transparent;
-  -webkit-text-stroke:1px var(--accent);
-  display:block;
-}
-.hero-name .line3{
-  display:block;color:var(--ink);font-size:0.45em;
-  font-weight:400;letter-spacing:0.3em;text-transform:uppercase;
-  font-family:'Space Mono',monospace;margin-top:0.5rem;
-}
-.hero-desc{
-  max-width:480px;font-size:0.82rem;color:var(--muted);
-  line-height:1.9;margin-bottom:3rem;
-  border-left:2px solid var(--accent);padding-left:1.5rem;
-}
-.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;}
-.btn{
-  font-family:'Space Mono',monospace;
-  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
-  padding:1rem 2.2rem;cursor:none;text-decoration:none;
-  transition:all 0.25s;display:inline-block;
-}
-.btn-primary{
-  background:var(--accent);color:var(--bg);font-weight:700;
-  border:1px solid var(--accent);
-}
-.btn-primary:hover{background:transparent;color:var(--accent);}
-.btn-outline{
-  background:transparent;color:var(--ink);
-  border:1px solid rgba(240,235,224,0.2);
-}
-.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 3.5rem;padding-top:80px;position:relative;z-index:1;}
+.hero-eyebrow{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--blue);margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;font-weight:500;}
+.hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--blue);}
 
-.hero-scroll{
-  position:absolute;bottom:2.5rem;right:3.5rem;
-  font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;
-  color:var(--muted);
-  display:flex;flex-direction:column;align-items:center;gap:0.8rem;
+/* MIXED FONT HERO — Playfair "Isha" + Bebas outline "builds." */
+.hero-name{line-height:0.88;margin-bottom:1.8rem;}
+.word-isha{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(5rem,13vw,12rem);
+  font-style:italic;font-weight:700;
+  color:var(--ink);display:block;
+  transition:filter 0.4s ease;
+  cursor:none;
 }
-.hero-scroll::after{
-  content:'';display:block;width:1px;height:60px;
-  background:linear-gradient(to bottom,var(--muted),transparent);
+.word-isha:hover{filter:blur(0px);}
+.word-builds{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(5rem,13vw,12rem);
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--pink);
+  display:block;letter-spacing:0.05em;
+  transition:filter 0.4s ease,color 0.4s ease,-webkit-text-stroke 0.4s ease;
+  cursor:none;
+  filter:blur(3px);
 }
+.hero-name:hover .word-builds{filter:blur(0px);}
+.hero-name:not(:hover) .word-isha{filter:blur(1.5px);}
+.hero-name:not(:hover) .word-builds{filter:blur(3px);}
+
+.hero-desc{max-width:480px;font-size:0.9rem;color:var(--muted);line-height:1.9;margin-bottom:3rem;border-left:2px solid var(--pink);padding-left:1.5rem;font-weight:400;}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn{font-family:'Satoshi',sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;padding:1rem 2.2rem;cursor:none;text-decoration:none;transition:all 0.25s;display:inline-block;border:none;}
+.btn-primary{background:var(--pink);color:var(--bg);border:1px solid var(--pink);}
+.btn-primary:hover{background:transparent;color:var(--pink);}
+.btn-outline{background:transparent;color:var(--blue);border:1px solid rgba(58,240,240,0.3);}
+.btn-outline:hover{border-color:var(--blue);background:rgba(58,240,240,0.05);}
+.hero-scroll{position:absolute;bottom:2.5rem;right:3.5rem;font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:0.8rem;font-weight:500;}
+.hero-scroll::after{content:'';display:block;width:1px;height:60px;background:linear-gradient(to bottom,var(--blue),transparent);}
 
 /* MARQUEE */
-.marquee-wrap{
-  overflow:hidden;border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-  background:var(--surface);padding:1rem 0;position:relative;z-index:1;
-}
-.marquee-track{
-  display:flex;width:max-content;
-  animation:marquee 20s linear infinite;
-}
-.marquee-item{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.4rem;letter-spacing:0.15em;
-  padding:0 2rem;color:var(--muted);
-  white-space:nowrap;
-}
-.marquee-item span{color:var(--accent);}
+.marquee-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);padding:1rem 0;position:relative;z-index:1;}
+.marquee-track{display:flex;width:max-content;animation:marquee 22s linear infinite;}
+.mi{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.15em;padding:0 2rem;color:var(--muted);white-space:nowrap;}
+.mi .b{color:var(--blue);}.mi .p{color:var(--pink);}
 @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
 /* SECTIONS */
-section.content{
-  position:relative;z-index:1;
-  padding:6rem 3.5rem;
-}
-.s-label{
-  font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:0.5rem;
-  display:flex;align-items:center;gap:0.8rem;
-}
-.s-label::before{content:'[ ';} .s-label::after{content:' ]';}
-.s-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2.5rem,5vw,4.5rem);
-  font-style:italic;line-height:1.1;margin-bottom:3.5rem;
-}
+section.content{position:relative;z-index:1;padding:6rem 3.5rem;}
+.s-label{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--blue);margin-bottom:0.5rem;display:flex;align-items:center;gap:0.8rem;font-weight:500;}
+.s-label::before{content:'[ ';}.s-label::after{content:' ]';}
+.s-title{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-style:italic;line-height:1.1;margin-bottom:3.5rem;}
+.s-title .p{color:var(--pink);}.s-title .b{color:var(--blue);}
 
 /* ABOUT */
-.about-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;}
-.about-text p{
-  font-size:0.82rem;color:var(--muted);line-height:2;
-  margin-bottom:1.2rem;
-}
+.about-bg{background:linear-gradient(135deg,rgba(12,13,24,0.9),rgba(16,17,30,0.95));}
+.about-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:5rem;align-items:start;}
+.about-text p{font-size:0.88rem;color:var(--muted);line-height:2;margin-bottom:1.2rem;font-weight:400;}
 .about-text strong{color:var(--ink);font-weight:700;}
-.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:2rem;background:var(--border);}
-.stat{
-  background:var(--bg);padding:2rem 1.5rem;
-  border:1px solid var(--border);
-}
-.stat-n{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:3.5rem;color:var(--accent);line-height:1;letter-spacing:0.05em;
-}
-.stat-l{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.3rem;}
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);margin-top:2rem;}
+.stat{background:var(--bg);padding:2rem 1.5rem;border:1px solid var(--border);}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;letter-spacing:0.05em;}
+.stat-n.b{color:var(--blue);}.stat-n.p{color:var(--pink);}
+.stat-l{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.3rem;font-weight:500;}
 
-/* EXPERIENCE */
-.exp-scroll{overflow-x:auto;padding-bottom:1.5rem;}
-.exp-scroll::-webkit-scrollbar{height:2px;}
-.exp-scroll::-webkit-scrollbar-track{background:var(--surface);}
-.exp-scroll::-webkit-scrollbar-thumb{background:var(--accent);}
-.exp-track{display:flex;gap:1.5rem;width:max-content;}
-.exp-card{
-  width:320px;flex-shrink:0;
-  border:1px solid var(--border);
-  background:var(--card);padding:2rem;
-  position:relative;overflow:hidden;
-  transition:border-color 0.3s,transform 0.3s;
-}
-.exp-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--accent);transform:scaleX(0);transform-origin:left;
-  transition:transform 0.4s ease;
-}
-.exp-card:hover::before{transform:scaleX(1);}
-.exp-card:hover{border-color:rgba(232,160,32,0.4);transform:translateY(-4px);}
-.exp-num{
-  font-family:'Bebas Neue',sans-serif;font-size:5rem;
-  color:rgba(232,160,32,0.08);position:absolute;
-  top:-0.5rem;right:1rem;line-height:1;pointer-events:none;
-}
-.exp-period{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:0.8rem;}
-.exp-company{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:0.3rem;}
-.exp-role{font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;margin-bottom:1.2rem;}
-.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:0.6rem;}
-.exp-bullets li{
-  font-size:0.72rem;color:var(--muted);line-height:1.6;
-  padding-left:1rem;position:relative;
-}
-.exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--accent);}
+/* TERMINAL */
+.terminal-wrap{background:var(--surface);}
+.terminal{background:#08090f;border:1px solid var(--border);border-radius:8px;max-width:700px;overflow:hidden;}
+.terminal-bar{background:#0d0e1a;padding:0.8rem 1rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid var(--border);}
+.t-dot{width:10px;height:10px;border-radius:50%;}
+.t-dot.r{background:#e040a0;}.t-dot.y{background:#3af0f0;}.t-dot.g{background:#7a4af0;}
+.terminal-title{font-size:0.65rem;color:var(--muted);margin-left:auto;margin-right:auto;letter-spacing:0.1em;font-family:'Satoshi',sans-serif;}
+.terminal-body{padding:1.5rem;min-height:260px;max-height:360px;overflow-y:auto;font-size:0.78rem;line-height:1.9;font-family:monospace;}
+.terminal-body::-webkit-scrollbar{width:2px;}
+.terminal-body::-webkit-scrollbar-thumb{background:var(--pink);}
+.t-line{margin-bottom:0.3rem;}
+.t-prompt{color:var(--pink);}.t-cmd{color:var(--ink);}
+.t-out{color:var(--muted);padding-left:1rem;}
+.t-out.hi{color:var(--blue);}.t-out.warn{color:var(--pink);}.t-out.lav{color:#a78bfa;}
+.t-input-row{display:flex;align-items:center;gap:0.5rem;padding:0 1.5rem 1rem;}
+.t-input{background:transparent;border:none;outline:none;color:var(--ink);font-family:monospace;font-size:0.78rem;flex:1;cursor:none;}
 
-/* SKILLS */
-.skills-bg{background:var(--surface);}
-.skills-cloud{display:flex;flex-wrap:wrap;gap:0.8rem;}
-.skill-pill{
-  font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;
-  padding:0.6rem 1.2rem;border:1px solid var(--border);
-  color:var(--muted);transition:all 0.25s;cursor:none;
-  position:relative;overflow:hidden;
-}
-.skill-pill::before{
-  content:'';position:absolute;inset:0;
-  background:var(--accent);transform:translateY(100%);
-  transition:transform 0.25s ease;z-index:0;
-}
-.skill-pill span{position:relative;z-index:1;}
-.skill-pill:hover{color:var(--bg);border-color:var(--accent);}
-.skill-pill:hover::before{transform:translateY(0);}
-.skill-pill.big{font-size:0.85rem;padding:0.8rem 1.6rem;}
-.skill-pill.sm{font-size:0.6rem;padding:0.45rem 0.9rem;}
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--blue),var(--pink),var(--blue));}
+.tl-item{position:relative;padding-bottom:3rem;padding-left:2rem;}
+.tl-dot{position:absolute;left:-2rem;top:0.4rem;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--muted);transform:translateX(-4px);transition:all 0.3s;}
+.tl-item:hover .tl-dot,.tl-item.active .tl-dot{border-color:var(--blue);background:var(--blue);box-shadow:0 0 12px rgba(58,240,240,0.5);}
+.tl-year{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--blue);margin-bottom:0.4rem;font-weight:500;}
+.tl-company{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin-bottom:0.2rem;}
+.tl-role{font-size:0.75rem;color:var(--muted);margin-bottom:0.8rem;font-weight:400;}
+.tl-desc{font-size:0.78rem;color:var(--muted);line-height:1.8;max-height:0;overflow:hidden;transition:max-height 0.5s ease,opacity 0.4s;opacity:0;}
+.tl-item:hover .tl-desc,.tl-item.active .tl-desc{max-height:200px;opacity:1;}
+
+/* CONSTELLATION */
+.constellation-section{background:var(--surface);}
+#constellation{width:100%;height:520px;display:block;}
+.const-tooltip{position:fixed;pointer-events:none;z-index:500;background:rgba(12,13,24,0.97);border:1px solid rgba(58,240,240,0.25);padding:0.5rem 1rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);display:none;white-space:nowrap;font-family:'Satoshi',sans-serif;font-weight:500;}
+.const-legend{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;}
+.const-legend-item{display:flex;align-items:center;gap:0.6rem;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.const-legend-dot{width:7px;height:7px;border-radius:50%;}
+.const-hint{font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(90,90,122,0.5);margin-top:0.8rem;font-weight:400;}
 
 /* PROJECTS */
 .proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);}
-.proj-card{
-  background:var(--bg);padding:2.5rem;
-  transition:background 0.3s;position:relative;overflow:hidden;
-  cursor:none;
-}
-.proj-card::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(232,160,32,0.06) 0%,transparent 60%);
-  opacity:0;transition:opacity 0.3s;pointer-events:none;
-}
-.proj-card:hover::after{opacity:1;}
-.proj-card:hover{background:var(--card);}
-.proj-type{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;}
+.proj-card{background:var(--bg);padding:2.5rem;transition:background 0.3s;position:relative;overflow:hidden;cursor:none;}
+.proj-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(58,240,240,0.06) 0%,transparent 60%);opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.proj-card:hover::after{opacity:1;}.proj-card:hover{background:var(--card);}
+.proj-num{font-family:'Bebas Neue',sans-serif;font-size:5rem;color:rgba(58,240,240,0.05);position:absolute;top:-0.5rem;right:1rem;line-height:1;pointer-events:none;}
+.proj-type{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:1rem;font-weight:500;}
 .proj-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-style:italic;margin-bottom:1rem;line-height:1.2;}
-.proj-desc{font-size:0.75rem;color:var(--muted);line-height:1.8;margin-bottom:1.5rem;}
+.proj-desc{font-size:0.78rem;color:var(--muted);line-height:1.8;margin-bottom:1.5rem;font-weight:400;}
 .proj-tags{display:flex;flex-wrap:wrap;gap:0.4rem;}
-.proj-tag{
-  font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;
-  padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--muted);
+.proj-tag{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.6rem;border:1px solid var(--border);color:var(--muted);font-weight:500;}
+.proj-arrow{position:absolute;bottom:2rem;right:2rem;font-size:1.5rem;color:rgba(58,240,240,0.15);transition:all 0.3s;}
+.proj-card:hover .proj-arrow{color:var(--blue);transform:translate(4px,-4px);}
+
+/* GALLERY — hover to expand */
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:rgba(58,240,240,0.05);}
+.gallery-item{
+  aspect-ratio:1;position:relative;overflow:hidden;cursor:none;
+  transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), z-index 0s;
+  z-index:1;
 }
-.proj-arrow{
-  position:absolute;bottom:2rem;right:2rem;
-  font-size:1.5rem;color:rgba(232,160,32,0.15);
-  transition:color 0.3s,transform 0.3s;
+.gallery-item:hover{
+  transform:scale(1.12);
+  z-index:10;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
 }
-.proj-card:hover .proj-arrow{color:var(--accent);transform:translate(4px,-4px);}
+.gallery-art{width:100%;height:100%;display:block;transition:filter 0.4s;}
+.gallery-item:hover .gallery-art{filter:brightness(1.05);}
+.gallery-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(7,8,15,0.9) 0%,transparent 50%);
+  display:flex;align-items:flex-end;padding:1.2rem;
+  opacity:0;transition:opacity 0.4s;
+}
+.gallery-item:hover .gallery-overlay{opacity:1;}
+.gallery-caption{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);font-weight:500;}
+.gallery-note{font-size:0.7rem;color:var(--muted);margin-top:1.5rem;font-style:italic;}
+
+/* NOW PLAYING */
+.now-playing-fixed{position:fixed;bottom:1.5rem;left:1.5rem;z-index:400;background:rgba(12,13,24,0.95);border:1px solid rgba(58,240,240,0.15);border-radius:6px;padding:1rem 1.2rem;width:270px;backdrop-filter:blur(20px);}
+.now-playing-fixed::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:6px 6px 0 0;background:linear-gradient(90deg,var(--blue) var(--prog,0%),rgba(58,240,240,0.1) var(--prog,0%));}
+.np-label{font-size:0.5rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(58,240,240,0.5);margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;font-weight:500;}
+.np-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);animation:blink 1.4s ease infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.15;}}
+.np-main{display:flex;align-items:center;gap:0.8rem;}
+.np-art{width:40px;height:40px;flex-shrink:0;border-radius:3px;overflow:hidden;}
+.np-art canvas{width:100%;height:100%;display:block;}
+.np-info{flex:1;min-width:0;}
+.np-song{font-size:0.78rem;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:0.1rem;}
+.np-artist{font-size:0.55rem;color:var(--muted);font-weight:400;}
+.np-controls{display:flex;align-items:center;gap:0.4rem;margin-left:0.3rem;}
+.np-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;transition:color 0.2s;font-family:monospace;}
+.np-btn:hover{color:var(--blue);}.np-btn.play{color:var(--pink);font-size:0.85rem;}
+.np-progress{margin-top:0.8rem;display:flex;align-items:center;gap:0.6rem;}
+.np-bar{flex:1;height:2px;background:rgba(58,240,240,0.1);border-radius:1px;overflow:hidden;cursor:pointer;}
+.np-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--pink));width:0%;transition:width 0.5s linear;}
+.np-time{font-size:0.5rem;color:var(--muted);white-space:nowrap;font-weight:400;}
 
 /* CONTACT */
 .contact-section{background:var(--surface);text-align:center;}
-.contact-email{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(2.5rem,7vw,6rem);
-  letter-spacing:0.1em;color:transparent;
-  -webkit-text-stroke:1px var(--muted);
-  transition:color 0.3s,-webkit-text-stroke 0.3s;
-  cursor:none;display:inline-block;margin:2rem 0 3rem;
-  text-decoration:none;
-}
-.contact-email:hover{color:var(--accent);-webkit-text-stroke:1px var(--accent);}
-.social-row{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;}
-.social-link{
-  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
-  color:var(--muted);text-decoration:none;
-  padding:0.8rem 1.5rem;border:1px solid var(--border);
-  transition:all 0.2s;cursor:none;
-}
-.social-link:hover{color:var(--accent);border-color:var(--accent);}
+.contact-email{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,6vw,5rem);letter-spacing:0.1em;color:transparent;-webkit-text-stroke:1px var(--muted);transition:all 0.3s;cursor:none;display:inline-block;margin:2rem 0 3rem;text-decoration:none;}
+.contact-email:hover{color:var(--blue);-webkit-text-stroke:1px var(--blue);}
+.social-row{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;}
+.social-link{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:0.8rem 1.5rem;border:1px solid var(--border);transition:all 0.2s;cursor:none;font-weight:500;}
+.social-link:hover{color:var(--pink);border-color:rgba(224,64,160,0.4);}
 
-footer{
-  position:relative;z-index:1;
-  background:var(--bg);border-top:1px solid var(--border);
-  padding:1.5rem 3.5rem;
-  display:flex;justify-content:space-between;align-items:center;
-}
-.footer-txt{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
-.footer-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite;}
+footer{position:relative;z-index:1;background:var(--bg);border-top:1px solid var(--border);padding:1.5rem 3.5rem;display:flex;justify-content:space-between;align-items:center;}
+.footer-txt{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.footer-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--pink));animation:pulse 2s ease infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* EASTER EGG */
+#egg{position:fixed;inset:0;z-index:9990;background:rgba(7,8,15,0.97);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;}
+#egg.show{display:flex;}
+#egg-title{font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:0.2em;text-align:center;background:linear-gradient(90deg,var(--blue),var(--pink),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:shimmer 3s linear infinite;}
+@keyframes shimmer{0%{background-position:0%;}100%{background-position:200%;}}
+#egg-sub{font-size:0.78rem;color:var(--muted);text-align:center;letter-spacing:0.08em;line-height:1.8;font-weight:400;}
+#egg-sub em{color:var(--pink);font-style:normal;}
+#egg-close{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.8rem 2rem;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:none;transition:all 0.2s;font-family:'Satoshi',sans-serif;font-weight:500;}
+#egg-close:hover{color:var(--blue);border-color:rgba(58,240,240,0.3);}
+#egg-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;}
+#egg>*:not(#egg-canvas){position:relative;z-index:1;}
 </style>
 </head>
 <body>
-
 <div id="cursor"></div>
 <div id="cursor-trail"></div>
 <canvas id="bg-canvas"></canvas>
 
+<div class="now-playing-fixed" id="player">
+  <div class="np-label"><div class="np-dot"></div>now playing</div>
+  <div class="np-main">
+    <div class="np-art"><canvas id="art-canvas" width="40" height="40"></canvas></div>
+    <div class="np-info"><div class="np-song" id="np-song">Hellfire</div><div class="np-artist" id="np-artist">Arcane · Season 2</div></div>
+    <div class="np-controls">
+      <button class="np-btn" id="btn-prev">◂◂</button>
+      <button class="np-btn play" id="btn-play">⏸</button>
+      <button class="np-btn" id="btn-next">▸▸</button>
+    </div>
+  </div>
+  <div class="np-progress">
+    <span class="np-time" id="np-cur">0:00</span>
+    <div class="np-bar"><div class="np-fill" id="np-fill"></div></div>
+    <span class="np-time" id="np-dur">3:24</span>
+  </div>
+</div>
+
+<div id="egg">
+  <canvas id="egg-canvas"></canvas>
+  <div id="egg-title">YOU FOUND ME ✦</div>
+  <div id="egg-sub">type "isha" anywhere on the page<br>now you know i hide things in my code too<br><em>powder would be proud</em></div>
+  <button id="egg-close" onclick="closeEgg()">← go back</button>
+</div>
+
+<div id="scroll-container">
 <nav>
   <div class="nav-logo">Isha</div>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
-    <li><a href="#experience">Work</a></li>
+    <li><a href="#terminal">Terminal</a></li>
+    <li><a href="#timeline">Journey</a></li>
+    <li><a href="#skills">Skills</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="#gallery">Art</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
+<section class="hero" id="hero">
   <p class="hero-eyebrow">AI Engineer · Data Scientist · Artist</p>
-  <h1 class="hero-name">
-    Isha
-    <span class="line2">builds.</span>
-    <span class="line3">San Francisco · Open to Work</span>
-  </h1>
-  <p class="hero-desc">
-    I build AI agents, RAG systems, and full-stack apps that solve real problems.
-    I also make comics, oil paintings, and digital art. The two aren't as different as you'd think.
-  </p>
+  <div class="hero-name">
+    <span class="word-isha">Isha</span>
+    <span class="word-builds">builds.</span>
+  </div>
+  <p class="hero-desc">I build AI agents, RAG systems, and full-stack apps. I also make comics, oil paintings, and digital art. The two aren't as different as you'd think.</p>
   <div class="hero-cta">
     <a href="#projects" class="btn btn-primary">See My Work</a>
-    <a href="#contact" class="btn btn-outline">Say Hello</a>
+    <a href="#terminal" class="btn btn-outline">Try the Terminal</a>
   </div>
   <div class="hero-scroll">Scroll</div>
 </section>
 
-<!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <span class="marquee-item">LangGraph <span>✦</span></span>
-    <span class="marquee-item">RAG Systems <span>✦</span></span>
-    <span class="marquee-item">FastAPI <span>✦</span></span>
-    <span class="marquee-item">React <span>✦</span></span>
-    <span class="marquee-item">Climate Tech <span>✦</span></span>
-    <span class="marquee-item">Healthcare AI <span>✦</span></span>
-    <span class="marquee-item">Cornell MPS <span>✦</span></span>
-    <span class="marquee-item">Novartis <span>✦</span></span>
-    <span class="marquee-item">Comics &amp; Painting <span>✦</span></span>
-    <span class="marquee-item">LangGraph <span>✦</span></span>
-    <span class="marquee-item">RAG Systems <span>✦</span></span>
-    <span class="marquee-item">FastAPI <span>✦</span></span>
-    <span class="marquee-item">React <span>✦</span></span>
-    <span class="marquee-item">Climate Tech <span>✦</span></span>
-    <span class="marquee-item">Healthcare AI <span>✦</span></span>
-    <span class="marquee-item">Cornell MPS <span>✦</span></span>
-    <span class="marquee-item">Novartis <span>✦</span></span>
-    <span class="marquee-item">Comics &amp; Painting <span>✦</span></span>
+    <span class="mi">LangGraph <span class="b">✦</span></span><span class="mi">RAG Systems <span class="p">✦</span></span><span class="mi">FastAPI <span class="b">✦</span></span><span class="mi">React <span class="p">✦</span></span><span class="mi">Climate Tech <span class="b">✦</span></span><span class="mi">Healthcare AI <span class="p">✦</span></span><span class="mi">Cornell MPS <span class="b">✦</span></span><span class="mi">Comics &amp; Painting <span class="p">✦</span></span>
+    <span class="mi">LangGraph <span class="b">✦</span></span><span class="mi">RAG Systems <span class="p">✦</span></span><span class="mi">FastAPI <span class="b">✦</span></span><span class="mi">React <span class="p">✦</span></span><span class="mi">Climate Tech <span class="b">✦</span></span><span class="mi">Healthcare AI <span class="p">✦</span></span><span class="mi">Cornell MPS <span class="b">✦</span></span><span class="mi">Comics &amp; Painting <span class="p">✦</span></span>
   </div>
 </div>
 
-<!-- ABOUT -->
-<section class="content" id="about">
+<section class="content about-bg" id="about">
   <p class="s-label">About</p>
-  <h2 class="s-title">Engineer, analyst,<br>and occasional artist.</h2>
+  <h2 class="s-title">Engineer, analyst,<br>and <span class="p">occasional artist.</span></h2>
   <div class="about-layout">
     <div class="about-text">
       <p>I'm an AI Engineer and Data Scientist who builds things that work in the real world — not just in demos. My stack spans <strong>LangGraph agents</strong>, full-stack apps (FastAPI + React), and large-scale data pipelines.</p>
       <p>Before AI engineering, I spent 2.5 years at <strong>Novartis</strong> working with healthcare claims and EHR data across 300+ payors. I hold a <strong>Master's from Cornell</strong> (AI/ML focus, 3.98 GPA) where I built a RAG assistant handling 500+ daily queries.</p>
-      <p>When I'm not writing code, I'm drawing comics, painting in oils, or making digital art. I think the best engineers are also creative thinkers — systems design and visual composition aren't so different.</p>
+      <p>When I'm not writing code, I'm drawing comics, painting in oils, or making digital art. Creativity is the thread that runs through everything I build.</p>
     </div>
     <div>
       <div class="stats-row">
-        <div class="stat"><div class="stat-n">2.5+</div><div class="stat-l">Years in AI & Data</div></div>
-        <div class="stat"><div class="stat-n">500+</div><div class="stat-l">Daily RAG queries</div></div>
-        <div class="stat"><div class="stat-n">300+</div><div class="stat-l">Payors analyzed</div></div>
-        <div class="stat"><div class="stat-n">3.98</div><div class="stat-l">Cornell GPA</div></div>
+        <div class="stat"><div class="stat-n b">2.5+</div><div class="stat-l">Years in AI & Data</div></div>
+        <div class="stat"><div class="stat-n p">500+</div><div class="stat-l">Daily RAG queries</div></div>
+        <div class="stat"><div class="stat-n p">300+</div><div class="stat-l">Payors analyzed</div></div>
+        <div class="stat"><div class="stat-n b">3.98</div><div class="stat-l">Cornell GPA</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- EXPERIENCE -->
-<section class="content" id="experience" style="padding-bottom:3rem;">
-  <p class="s-label">Experience</p>
-  <h2 class="s-title">Where I've built things.</h2>
-  <div class="exp-scroll">
-    <div class="exp-track">
-      <div class="exp-card">
-        <div class="exp-num">01</div>
-        <div class="exp-period">2024 – 2025</div>
-        <div class="exp-company">Knudsen.Earth</div>
-        <div class="exp-role">AI Engineer · Full Stack</div>
-        <ul class="exp-bullets">
-          <li>Built LangGraph multi-agent systems for climate tech clients</li>
-          <li>Primary technical client contact, led all AI deliverables</li>
-          <li>Full-stack with FastAPI, React/TypeScript, PostgreSQL</li>
-          <li>AIS pipelines to track active fishing vessels in real time</li>
-          <li>ML models for tow prediction & permit approval probability</li>
-        </ul>
-      </div>
-      <div class="exp-card">
-        <div class="exp-num">02</div>
-        <div class="exp-period">2022 – 2024</div>
-        <div class="exp-company">Novartis</div>
-        <div class="exp-role">Business Data Analyst</div>
-        <ul class="exp-bullets">
-          <li>Analyzed claims & EHR data across 300+ healthcare payors</li>
-          <li>Built pipelines processing millions of patient records</li>
-          <li>Dashboards and reports shaping formulary decisions</li>
-          <li>Stakeholder-facing analytics across cross-functional teams</li>
-        </ul>
-      </div>
-      <div class="exp-card">
-        <div class="exp-num">03</div>
-        <div class="exp-period">2022 – 2023</div>
-        <div class="exp-company">Cornell University</div>
-        <div class="exp-role">Graduate Researcher · NLP</div>
-        <ul class="exp-bullets">
-          <li>Built a RAG virtual assistant deployed campus-wide</li>
-          <li>Handled 500+ daily student inquiries via semantic search</li>
-          <li>Designed retrieval pipeline using vector embeddings</li>
-          <li>GPA: 3.98 · MPS in Information Science (AI/ML)</li>
-        </ul>
-      </div>
+<section class="content terminal-wrap" id="terminal">
+  <p class="s-label">Interactive</p>
+  <h2 class="s-title">Talk to my <span class="b">portfolio.</span></h2>
+  <div class="terminal">
+    <div class="terminal-bar"><div class="t-dot r"></div><div class="t-dot y"></div><div class="t-dot g"></div><span class="terminal-title">isha@portfolio ~</span></div>
+    <div class="terminal-body" id="t-body">
+      <div class="t-line"><span class="t-out hi">Welcome! I'm Isha's portfolio terminal.</span></div>
+      <div class="t-line"><span class="t-out">Type a command and press Enter.</span></div>
+      <div class="t-line"><span class="t-out warn">→ Try: whoami · skills · experience · projects · contact · art · arcane · secret</span></div>
+      <div class="t-line"></div>
     </div>
+    <div class="t-input-row"><span class="t-prompt">isha@portfolio:~$</span><input class="t-input" id="t-input" type="text" placeholder="type a command..." autocomplete="off" spellcheck="false"></div>
   </div>
 </section>
 
-<!-- SKILLS -->
-<section class="content skills-bg" id="skills">
+<section class="content" id="timeline">
+  <p class="s-label">Journey</p>
+  <h2 class="s-title">How I got <span class="p">here.</span></h2>
+  <div class="timeline">
+    <div class="tl-item active"><div class="tl-dot"></div><div class="tl-year">2024 – 2025</div><div class="tl-company">Knudsen.Earth</div><div class="tl-role">AI Engineer · Full Stack</div><div class="tl-desc">Built LangGraph multi-agent systems for climate tech clients. Primary technical client contact. FastAPI, React/TypeScript, PostgreSQL. AIS pipelines for real-time fishing vessel tracking.</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2022 – 2024</div><div class="tl-company">Novartis</div><div class="tl-role">Business Data Analyst</div><div class="tl-desc">Healthcare claims and EHR data across 300+ payors. Pipelines processing millions of patient records. Dashboards and reports shaping formulary decisions.</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2022 – 2023</div><div class="tl-company">Cornell University</div><div class="tl-role">MPS Information Science · GPA 3.98</div><div class="tl-desc">Built a RAG-powered virtual assistant handling 500+ daily student queries. Specialized in AI/ML. Graduated with a 3.98 GPA.</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">Always</div><div class="tl-company">The Studio</div><div class="tl-role">Comics · Oil Painting · Digital Art</div><div class="tl-desc">Making art has always run parallel to everything else. Comics, oil paintings, digital illustrations. Creativity is the thread that connects it all.</div></div>
+  </div>
+</section>
+
+<section class="content constellation-section" id="skills">
   <p class="s-label">Skills</p>
-  <h2 class="s-title">What I reach for.</h2>
-  <div class="skills-cloud">
-    <div class="skill-pill big"><span>LangGraph</span></div>
-    <div class="skill-pill big"><span>RAG</span></div>
-    <div class="skill-pill"><span>LangChain</span></div>
-    <div class="skill-pill big"><span>Python</span></div>
-    <div class="skill-pill"><span>FastAPI</span></div>
-    <div class="skill-pill sm"><span>Embeddings</span></div>
-    <div class="skill-pill big"><span>React</span></div>
-    <div class="skill-pill"><span>TypeScript</span></div>
-    <div class="skill-pill sm"><span>PostgreSQL</span></div>
-    <div class="skill-pill"><span>SQL</span></div>
-    <div class="skill-pill big"><span>Prompt Engineering</span></div>
-    <div class="skill-pill sm"><span>Snowflake</span></div>
-    <div class="skill-pill"><span>Pandas</span></div>
-    <div class="skill-pill"><span>Scikit-learn</span></div>
-    <div class="skill-pill sm"><span>Docker</span></div>
-    <div class="skill-pill"><span>AWS</span></div>
-    <div class="skill-pill sm"><span>EHR Data</span></div>
-    <div class="skill-pill"><span>Statistical Modeling</span></div>
-    <div class="skill-pill sm"><span>Tableau</span></div>
-    <div class="skill-pill big"><span>Node.js</span></div>
-    <div class="skill-pill sm"><span>dbt</span></div>
-    <div class="skill-pill"><span>Semantic Search</span></div>
-    <div class="skill-pill sm"><span>Vector DBs</span></div>
-    <div class="skill-pill"><span>Fine-tuning</span></div>
+  <h2 class="s-title">What I'm <span class="b">made of.</span></h2>
+  <canvas id="constellation"></canvas>
+  <div class="const-tooltip" id="const-tooltip"></div>
+  <div class="const-legend">
+    <div class="const-legend-item"><div class="const-legend-dot" style="background:#3af0f0"></div>AI & ML</div>
+    <div class="const-legend-item"><div class="const-legend-dot" style="background:#e040a0"></div>Full Stack</div>
+    <div class="const-legend-item"><div class="const-legend-dot" style="background:#a78bfa"></div>Data</div>
+    <div class="const-legend-item"><div class="const-legend-dot" style="background:#f0a020"></div>Infrastructure</div>
   </div>
+  <div class="const-hint">hover a star to explore connections</div>
 </section>
 
-<!-- PROJECTS -->
 <section class="content" id="projects">
   <p class="s-label">Projects</p>
-  <h2 class="s-title">Things I've shipped.</h2>
+  <h2 class="s-title">Things I've <span class="p">shipped.</span></h2>
   <div class="proj-grid">
-    <div class="proj-card" onmousemove="trackMouse(event,this)">
-      <div class="proj-type">AI Agents · Climate Tech</div>
-      <div class="proj-title">Fishing Intelligence System</div>
-      <div class="proj-desc">Multi-agent LangGraph system analyzing AIS vessel data to track active scallop fishers using speed profiles, port distance, and Days-at-Sea regulations.</div>
-      <div class="proj-tags">
-        <span class="proj-tag">LangGraph</span>
-        <span class="proj-tag">Python</span>
-        <span class="proj-tag">AIS Data</span>
-        <span class="proj-tag">PostgreSQL</span>
-      </div>
-      <div class="proj-arrow">↗</div>
-    </div>
-    <div class="proj-card" onmousemove="trackMouse(event,this)">
-      <div class="proj-type">RAG · NLP</div>
-      <div class="proj-title">University Virtual Assistant</div>
-      <div class="proj-desc">RAG-powered assistant deployed at Cornell handling 500+ daily student queries. Built custom retrieval pipeline with semantic search and vector embeddings.</div>
-      <div class="proj-tags">
-        <span class="proj-tag">RAG</span>
-        <span class="proj-tag">LangChain</span>
-        <span class="proj-tag">Vector DB</span>
-        <span class="proj-tag">React</span>
-      </div>
-      <div class="proj-arrow">↗</div>
-    </div>
-    <div class="proj-card" onmousemove="trackMouse(event,this)">
-      <div class="proj-type">Geospatial · Statistics</div>
-      <div class="proj-title">Scallop Survey Analysis</div>
-      <div class="proj-desc">Statistical comparison of 4 survey platforms (NOAA dredge, HabCam, V1/V2 AUV) using variograms, CV calculations, and cost-accuracy tradeoff curves.</div>
-      <div class="proj-tags">
-        <span class="proj-tag">Python</span>
-        <span class="proj-tag">Geostatistics</span>
-        <span class="proj-tag">Variograms</span>
-      </div>
-      <div class="proj-arrow">↗</div>
-    </div>
-    <div class="proj-card" onmousemove="trackMouse(event,this)">
-      <div class="proj-type">Healthcare · Analytics</div>
-      <div class="proj-title">Claims & EHR Platform</div>
-      <div class="proj-desc">Enterprise analytics across 300+ healthcare payors at Novartis. Pipelines, dashboards, and insights driving formulary and market access decisions.</div>
-      <div class="proj-tags">
-        <span class="proj-tag">SQL</span>
-        <span class="proj-tag">Snowflake</span>
-        <span class="proj-tag">Tableau</span>
-        <span class="proj-tag">Python</span>
-      </div>
-      <div class="proj-arrow">↗</div>
-    </div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)"><div class="proj-num">01</div><div class="proj-type">AI Agents · Climate Tech</div><div class="proj-title">Fishing Intelligence System</div><div class="proj-desc">Multi-agent LangGraph system analyzing AIS vessel data to track active scallop fishers using speed profiles, port distance, and Days-at-Sea regulations.</div><div class="proj-tags"><span class="proj-tag">LangGraph</span><span class="proj-tag">Python</span><span class="proj-tag">AIS Data</span><span class="proj-tag">PostgreSQL</span></div><div class="proj-arrow">↗</div></div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)"><div class="proj-num">02</div><div class="proj-type">RAG · NLP</div><div class="proj-title">University Virtual Assistant</div><div class="proj-desc">RAG-powered assistant deployed at Cornell handling 500+ daily student queries. Custom retrieval pipeline with semantic search and vector embeddings.</div><div class="proj-tags"><span class="proj-tag">RAG</span><span class="proj-tag">LangChain</span><span class="proj-tag">Vector DB</span><span class="proj-tag">React</span></div><div class="proj-arrow">↗</div></div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)"><div class="proj-num">03</div><div class="proj-type">Geospatial · Statistics</div><div class="proj-title">Scallop Survey Analysis</div><div class="proj-desc">Statistical comparison of 4 survey platforms using variograms, CV calculations, and cost-accuracy tradeoff curves on Georges Bank.</div><div class="proj-tags"><span class="proj-tag">Python</span><span class="proj-tag">Geostatistics</span><span class="proj-tag">Variograms</span></div><div class="proj-arrow">↗</div></div>
+    <div class="proj-card" onmousemove="trackMouse(event,this)"><div class="proj-num">04</div><div class="proj-type">Healthcare · Analytics</div><div class="proj-title">Claims & EHR Platform</div><div class="proj-desc">Enterprise analytics across 300+ healthcare payors at Novartis. Pipelines, dashboards, and insights driving formulary decisions.</div><div class="proj-tags"><span class="proj-tag">SQL</span><span class="proj-tag">Snowflake</span><span class="proj-tag">Tableau</span><span class="proj-tag">Python</span></div><div class="proj-arrow">↗</div></div>
   </div>
 </section>
 
-<!-- CONTACT -->
-<section class="content contact-section" id="contact">
-  <p class="s-label">Contact</p>
-  <h2 class="s-title" style="text-align:center;">Let's make<br>something.</h2>
-  <div style="text-align:center;">
-    <!-- TODO: Replace with your real email -->
-    <a href="mailto:im386@cornell.edu" class="contact-email">im386@cornell.edu</a>
+<section class="content" id="gallery" style="background:var(--surface);">
+  <p class="s-label">Art</p>
+  <h2 class="s-title">The other <span class="b">side of me.</span></h2>
+  <div class="gallery-grid">
+    <div class="gallery-item"><canvas class="gallery-art" id="gart1"></canvas><div class="gallery-overlay"><div class="gallery-caption">Neural Flow</div></div></div>
+    <div class="gallery-item"><canvas class="gallery-art" id="gart2"></canvas><div class="gallery-overlay"><div class="gallery-caption">Data Bloom</div></div></div>
+    <div class="gallery-item"><canvas class="gallery-art" id="gart3"></canvas><div class="gallery-overlay"><div class="gallery-caption">Circuit Dreams</div></div></div>
+    <div class="gallery-item"><canvas class="gallery-art" id="gart4"></canvas><div class="gallery-overlay"><div class="gallery-caption">Particle Storm</div></div></div>
+    <div class="gallery-item"><canvas class="gallery-art" id="gart5"></canvas><div class="gallery-overlay"><div class="gallery-caption">Comic · Coming Soon</div></div></div>
+    <div class="gallery-item"><canvas class="gallery-art" id="gart6"></canvas><div class="gallery-overlay"><div class="gallery-caption">Oil Study · In Progress</div></div></div>
   </div>
+  <p class="gallery-note">↑ Replace these with your actual artwork — swap canvas elements for img tags</p>
+</section>
+
+<section class="content contact-section" id="contact">
+  <p class="s-label" style="justify-content:center;">Contact</p>
+  <h2 class="s-title" style="text-align:center;">Let's make<br><span class="p">something.</span></h2>
+  <div style="text-align:center;"><a href="mailto:im386@cornell.edu" class="contact-email">im386@cornell.edu</a></div>
   <div class="social-row">
-    <!-- TODO: Replace # with your real URLs -->
     <a href="https://github.com/Isha-madhurendra" class="social-link">GitHub</a>
     <a href="https://linkedin.com/in/isha-madhurendra999" class="social-link">LinkedIn</a>
     <a href="/resume.pdf" class="social-link">Resume</a>
-    <a href="#" class="social-link">Art Portfolio</a>
+    <a href="#gallery" class="social-link">Art Portfolio</a>
   </div>
 </section>
 
 <footer>
   <span class="footer-txt">© 2025 Isha · Built from scratch</span>
   <div class="footer-dot"></div>
-  <span class="footer-txt">San Francisco, CA</span>
+  <span class="footer-txt">type "isha" for a surprise ✦</span>
 </footer>
+</div><!-- end scroll-container -->
 
 <script>
-// CUSTOM CURSOR
-const cursor = document.getElementById('cursor');
-const trail = document.getElementById('cursor-trail');
+// ── SMOOTH SCROLL (Lenis-style inertia, no library needed) ──
+let scrollY=0,targetY=0,ease=0.1;
+function smoothScroll(){
+  scrollY+=(targetY-scrollY)*ease;
+  document.getElementById('scroll-container').style.transform=`translateY(${-scrollY}px)`;
+  // update body height so page is scrollable
+  document.body.style.height=document.getElementById('scroll-container').offsetHeight+'px';
+  requestAnimationFrame(smoothScroll);
+}
+window.addEventListener('wheel',e=>{
+  targetY=Math.max(0,Math.min(targetY+e.deltaY,document.getElementById('scroll-container').offsetHeight-window.innerHeight));
+},{passive:true});
+window.addEventListener('touchstart',e=>{window._ty=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchmove',e=>{
+  const dy=window._ty-e.touches[0].clientY;window._ty=e.touches[0].clientY;
+  targetY=Math.max(0,Math.min(targetY+dy,document.getElementById('scroll-container').offsetHeight-window.innerHeight));
+},{passive:true});
+// nav anchor smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const el=document.querySelector(a.getAttribute('href'));
+    if(el){targetY=Math.max(0,el.offsetTop-70);}
+  });
+});
+smoothScroll();
+
+// ── CURSOR ──
+const cursor=document.getElementById('cursor'),trail=document.getElementById('cursor-trail');
 let mx=0,my=0,tx=0,ty=0;
-document.addEventListener('mousemove',e=>{
-  mx=e.clientX; my=e.clientY;
-  cursor.style.left=(mx-6)+'px';
-  cursor.style.top=(my-6)+'px';
-});
-setInterval(()=>{
-  tx+=(mx-tx)*0.15; ty+=(my-ty)*0.15;
-  trail.style.left=(tx-20)+'px';
-  trail.style.top=(ty-20)+'px';
-},16);
-document.querySelectorAll('a,.btn,.skill-pill,.proj-card,.exp-card,.contact-email,.social-link').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{
-    cursor.style.transform='scale(2.5)';
-    trail.style.transform='scale(0.5)';
-  });
-  el.addEventListener('mouseleave',()=>{
-    cursor.style.transform='scale(1)';
-    trail.style.transform='scale(1)';
-  });
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=(mx-6)+'px';cursor.style.top=(my-6)+'px';});
+setInterval(()=>{tx+=(mx-tx)*0.15;ty+=(my-ty)*0.15;trail.style.left=(tx-20)+'px';trail.style.top=(ty-20)+'px';},16);
+document.querySelectorAll('a,.btn,.proj-card,.tl-item,.gallery-item,.social-link,button,.t-input,.np-btn,.word-isha,.word-builds').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2.5)';trail.style.transform='scale(0.5)';});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';trail.style.transform='scale(1)';});
 });
 
-// CANVAS PARTICLE FIELD
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let W,H,particles=[];
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-resize(); window.addEventListener('resize',resize);
+// ── BG CANVAS ──
+const bgC=document.getElementById('bg-canvas'),bgX=bgC.getContext('2d');
+let W,H,pts=[];
+function resize(){W=bgC.width=window.innerWidth;H=bgC.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+class P{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-0.5)*0.3;this.vy=(Math.random()-0.5)*0.3;this.r=Math.random()*1.5+0.3;this.a=Math.random()*0.35+0.05;const r=Math.random();this.c=r<0.5?'58,240,240':r<0.8?'224,64,160':'122,74,240';}update(){this.x+=this.vx;this.y+=this.vy;const dx=this.x-mx,dy=this.y-my,d=Math.sqrt(dx*dx+dy*dy);if(d<120){const f=(120-d)/120;this.x+=dx/d*f*2;this.y+=dy/d*f*2;}if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();}draw(){bgX.beginPath();bgX.arc(this.x,this.y,this.r,0,Math.PI*2);bgX.fillStyle=`rgba(${this.c},${this.a})`;bgX.fill();}}
+for(let i=0;i<140;i++)pts.push(new P());
+function animBg(){bgX.clearRect(0,0,W,H);for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){bgX.beginPath();bgX.moveTo(pts[i].x,pts[i].y);bgX.lineTo(pts[j].x,pts[j].y);bgX.strokeStyle=`rgba(58,240,240,${0.05*(1-d/100)})`;bgX.lineWidth=0.5;bgX.stroke();}}pts.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animBg);}
+animBg();
 
-class Particle{
-  constructor(){this.reset();}
-  reset(){
-    this.x=Math.random()*W; this.y=Math.random()*H;
-    this.vx=(Math.random()-0.5)*0.3; this.vy=(Math.random()-0.5)*0.3;
-    this.r=Math.random()*1.5+0.3;
-    this.alpha=Math.random()*0.4+0.05;
-    this.color=Math.random()>0.85?'232,160,32':'240,235,224';
-  }
-  update(){
-    this.x+=this.vx; this.y+=this.vy;
-    const dx=this.x-mx, dy=this.y-my;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<120){
-      const force=(120-dist)/120;
-      this.x+=dx/dist*force*2;
-      this.y+=dy/dist*force*2;
-    }
-    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
-  }
-  draw(){
-    ctx.beginPath();
-    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(${this.color},${this.alpha})`;
-    ctx.fill();
-  }
-}
-for(let i=0;i<120;i++) particles.push(new Particle());
+// ── TERMINAL ──
+const cmds={
+  whoami:()=>['<span class="t-out hi">Isha Madhurendra</span>','<span class="t-out">AI Engineer · Data Scientist · Artist</span>','<span class="t-out">Based in San Francisco, CA</span>','<span class="t-out">Cornell MPS \'23 · GPA 3.98</span>','<span class="t-out warn">currently vibing to the Arcane OST 🎵</span>'],
+  skills:()=>['<span class="t-out warn">── AI & ML ──</span>','<span class="t-out">LangGraph, LangChain, RAG, Embeddings, Prompt Engineering</span>','<span class="t-out warn">── Full Stack ──</span>','<span class="t-out">FastAPI, React, TypeScript, Node.js, PostgreSQL</span>','<span class="t-out warn">── Data ──</span>','<span class="t-out">Python, SQL, Pandas, Snowflake, Tableau, dbt</span>'],
+  experience:()=>['<span class="t-out hi">Knudsen.Earth</span><span class="t-out"> · AI Engineer (2024–2025)</span>','<span class="t-out hi">Novartis</span><span class="t-out"> · Business Data Analyst (2022–2024)</span>','<span class="t-out hi">Cornell</span><span class="t-out"> · Graduate Researcher, NLP (2022–2023)</span>'],
+  projects:()=>['<span class="t-out hi">1.</span><span class="t-out"> Fishing Intelligence System (LangGraph + AIS)</span>','<span class="t-out hi">2.</span><span class="t-out"> Cornell RAG Virtual Assistant (500+ daily queries)</span>','<span class="t-out hi">3.</span><span class="t-out"> Scallop Survey Analysis (Geostatistics)</span>','<span class="t-out hi">4.</span><span class="t-out"> Claims & EHR Platform (Novartis, 300+ payors)</span>'],
+  contact:()=>['<span class="t-out">Email: your@email.com</span>','<span class="t-out">LinkedIn: linkedin.com/in/isha-madhurendra</span>','<span class="t-out">GitHub: github.com/isha-madhurendra</span>'],
+  art:()=>['<span class="t-out hi">Comics, oil paintings, digital illustrations ✨</span>','<span class="t-out">Scroll down to the Art section to see my work.</span>','<span class="t-out lav">currently inspired by: Arcane / Powder aesthetic 💙🩷</span>'],
+  arcane:()=>['<span class="t-out warn">HELLO FELLOW ARCANE FAN 💙🩷</span>','<span class="t-out">currently listening to: Hellfire, Enemy, Guns For Hire</span>','<span class="t-out lav">favorite character: Powder/Jinx (obviously)</span>','<span class="t-out hi">powder would approve of this portfolio.</span>'],
+  secret:()=>['<span class="t-out lav">you found one secret... but there\'s another.</span>','<span class="t-out">try typing "isha" anywhere on the page 👀</span>'],
+  help:()=>['<span class="t-out warn">available commands:</span>','<span class="t-out">whoami · skills · experience · projects · contact · art · arcane · secret · clear</span>'],
+  clear:()=>null
+};
+const tbody=document.getElementById('t-body'),tinput=document.getElementById('t-input');
+tinput.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const cmd=tinput.value.trim().toLowerCase();if(!cmd)return;
+  const pl=document.createElement('div');pl.className='t-line';pl.innerHTML=`<span class="t-prompt">isha@portfolio:~$</span> <span class="t-cmd">${cmd}</span>`;tbody.appendChild(pl);
+  if(cmd==='clear'){tbody.innerHTML='';tinput.value='';return;}
+  const fn=cmds[cmd];
+  if(fn){const lines=fn();if(lines)lines.forEach(l=>{const d=document.createElement('div');d.className='t-line';d.innerHTML=l;tbody.appendChild(d);});}
+  else{const d=document.createElement('div');d.className='t-line';d.innerHTML=`<span class="t-out warn">command not found: ${cmd} — try "help"</span>`;tbody.appendChild(d);}
+  tbody.appendChild(document.createElement('br'));tbody.scrollTop=tbody.scrollHeight;tinput.value='';
+});
 
-function drawConnections(){
-  for(let i=0;i<particles.length;i++){
-    for(let j=i+1;j<particles.length;j++){
-      const dx=particles[i].x-particles[j].x;
-      const dy=particles[i].y-particles[j].y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<100){
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x,particles[i].y);
-        ctx.lineTo(particles[j].x,particles[j].y);
-        ctx.strokeStyle=`rgba(232,160,32,${0.06*(1-d/100)})`;
-        ctx.lineWidth=0.5;
-        ctx.stroke();
-      }
-    }
-  }
-}
-function animate(){
-  ctx.clearRect(0,0,W,H);
-  drawConnections();
-  particles.forEach(p=>{p.update();p.draw();});
-  requestAnimationFrame(animate);
-}
-animate();
+// ── TIMELINE ──
+document.querySelectorAll('.tl-item').forEach(item=>{item.addEventListener('mouseenter',()=>{document.querySelectorAll('.tl-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');});});
 
-// PROJECT CARD MOUSE GLOW
-function trackMouse(e,card){
-  const rect=card.getBoundingClientRect();
-  const x=((e.clientX-rect.left)/rect.width*100).toFixed(1);
-  const y=((e.clientY-rect.top)/rect.height*100).toFixed(1);
-  card.style.setProperty('--mx',x+'%');
-  card.style.setProperty('--my',y+'%');
+// ── CONSTELLATION ──
+const cc=document.getElementById('constellation'),cx=cc.getContext('2d');
+const ctooltip=document.getElementById('const-tooltip');
+function cResize(){cc.width=cc.offsetWidth;cc.height=520;}
+cResize();window.addEventListener('resize',()=>{cResize();placeNodes();});
+const groups={ai:{color:'58,240,240'},stack:{color:'224,64,160'},data:{color:'167,139,250'},infra:{color:'240,160,32'}};
+const skills=[
+  {name:'LangGraph',group:'ai',size:18,connections:['LangChain','RAG','Python','Prompt Eng']},
+  {name:'RAG',group:'ai',size:16,connections:['LangGraph','LangChain','Vector DBs','Python']},
+  {name:'LangChain',group:'ai',size:14,connections:['LangGraph','RAG','Python']},
+  {name:'Prompt Eng',group:'ai',size:11,connections:['LangGraph','LangChain']},
+  {name:'Vector DBs',group:'ai',size:11,connections:['RAG','Python']},
+  {name:'Fine-tuning',group:'ai',size:9,connections:['Python','LangChain']},
+  {name:'React',group:'stack',size:15,connections:['TypeScript','FastAPI','Node.js']},
+  {name:'FastAPI',group:'stack',size:15,connections:['Python','React','PostgreSQL']},
+  {name:'TypeScript',group:'stack',size:12,connections:['React','Node.js']},
+  {name:'Node.js',group:'stack',size:11,connections:['TypeScript','React']},
+  {name:'PostgreSQL',group:'stack',size:11,connections:['FastAPI','Python','SQL']},
+  {name:'Python',group:'data',size:20,connections:['LangGraph','RAG','FastAPI','Pandas','SQL','Scikit-learn']},
+  {name:'SQL',group:'data',size:14,connections:['Python','PostgreSQL','Snowflake']},
+  {name:'Pandas',group:'data',size:12,connections:['Python','Scikit-learn']},
+  {name:'Scikit-learn',group:'data',size:11,connections:['Python','Pandas']},
+  {name:'Snowflake',group:'data',size:11,connections:['SQL','dbt']},
+  {name:'Tableau',group:'data',size:10,connections:['SQL','Pandas']},
+  {name:'dbt',group:'data',size:9,connections:['Snowflake','SQL']},
+  {name:'Docker',group:'infra',size:11,connections:['AWS','FastAPI']},
+  {name:'AWS',group:'infra',size:12,connections:['Docker','Python']},
+  {name:'GCP',group:'infra',size:10,connections:['AWS','Python']},
+];
+function placeNodes(){
+  const cw=cc.width,ch=cc.height,pcx=cw/2,pcy=ch/2;
+  skills.forEach((s,i)=>{
+    if(s.name==='Python'){s.x=pcx;s.y=pcy;}
+    else{const angle=(i/(skills.length-1))*Math.PI*2,r=80+Math.random()*140;s.x=pcx+Math.cos(angle)*r*(0.6+Math.random()*0.8);s.y=pcy+Math.sin(angle)*r*(0.5+Math.random()*0.8);}
+    s.vx=(Math.random()-0.5)*0.3;s.vy=(Math.random()-0.5)*0.3;s.baseX=s.x;s.baseY=s.y;
+  });
 }
+placeNodes();
+let chovered=null,cmx=0,cmy=0;
+cc.addEventListener('mousemove',e=>{
+  const rect=cc.getBoundingClientRect();cmx=e.clientX-rect.left;cmy=e.clientY-rect.top;
+  chovered=null;
+  skills.forEach(s=>{const dx=s.x-cmx,dy=s.y-cmy;if(Math.sqrt(dx*dx+dy*dy)<s.size+6)chovered=s;});
+  if(chovered){ctooltip.style.display='block';ctooltip.style.left=(e.clientX+14)+'px';ctooltip.style.top=(e.clientY-10)+'px';ctooltip.textContent=chovered.name+' · '+{ai:'AI & ML',stack:'Full Stack',data:'Data',infra:'Infrastructure'}[chovered.group];}
+  else{ctooltip.style.display='none';}
+});
+cc.addEventListener('mouseleave',()=>{chovered=null;ctooltip.style.display='none';});
+function drawConst(){
+  cx.clearRect(0,0,cc.width,cc.height);
+  skills.forEach(s=>{if(s.name!=='Python'){s.x+=s.vx;s.y+=s.vy;if(Math.abs(s.x-s.baseX)>40)s.vx*=-1;if(Math.abs(s.y-s.baseY)>40)s.vy*=-1;const mdx=s.x-cmx,mdy=s.y-cmy,md=Math.sqrt(mdx*mdx+mdy*mdy);if(md<80){s.x+=mdx/md*1.5;s.y+=mdy/md*1.5;}}});
+  skills.forEach(s=>{s.connections.forEach(name=>{const t=skills.find(x=>x.name===name);if(!t)return;const isActive=chovered&&(chovered.name===s.name||chovered.name===t.name||chovered.connections.includes(s.name)||chovered.connections.includes(t.name));if(chovered&&!isActive)return;cx.beginPath();cx.moveTo(s.x,s.y);cx.lineTo(t.x,t.y);cx.strokeStyle=`rgba(${groups[s.group].color},${chovered?0.5:0.08})`;cx.lineWidth=chovered&&isActive?1:0.5;cx.stroke();});});
+  skills.forEach(s=>{const c=groups[s.group].color,isH=chovered&&chovered.name===s.name,isCon=chovered&&chovered.connections.includes(s.name),dimmed=chovered&&!isH&&!isCon,alpha=dimmed?0.15:1,r=s.size;if(isH||isCon){const g=cx.createRadialGradient(s.x,s.y,0,s.x,s.y,r*3);g.addColorStop(0,`rgba(${c},0.3)`);g.addColorStop(1,`rgba(${c},0)`);cx.beginPath();cx.arc(s.x,s.y,r*3,0,Math.PI*2);cx.fillStyle=g;cx.fill();}cx.beginPath();cx.arc(s.x,s.y,r,0,Math.PI*2);cx.strokeStyle=`rgba(${c},${alpha*0.4})`;cx.lineWidth=1;cx.stroke();cx.beginPath();cx.arc(s.x,s.y,r*0.55,0,Math.PI*2);cx.fillStyle=isH?`rgba(${c},0.9)`:isCon?`rgba(${c},0.6)`:`rgba(${c},${alpha*0.25})`;cx.fill();cx.fillStyle=dimmed?`rgba(90,90,122,0.3)`:isH?`rgba(${c},1)`:isCon?`rgba(${c},0.9)`:`rgba(240,238,255,0.55)`;cx.font=`${isH?'700':'400'} ${Math.max(9,r*0.65)}px Satoshi,sans-serif`;cx.textAlign='center';cx.fillText(s.name,s.x,s.y+r+13);});
+  requestAnimationFrame(drawConst);
+}
+drawConst();
+
+// ── GALLERY ART ──
+function makeGalleryArt(id,type){const c=document.getElementById(id);if(!c)return;const ctx=c.getContext('2d');const w=c.width=c.offsetWidth||300,h=c.height=c.offsetHeight||300;ctx.fillStyle='#07080f';ctx.fillRect(0,0,w,h);if(type===0){for(let i=0;i<50;i++){const px=Math.random()*w,py=Math.random()*h;ctx.beginPath();ctx.arc(px,py,Math.random()*3+1,0,Math.PI*2);ctx.fillStyle=Math.random()>0.5?`rgba(58,240,240,${Math.random()*0.8+0.2})`:`rgba(224,64,160,${Math.random()*0.8+0.2})`;ctx.fill();for(let j=0;j<3;j++){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+(Math.random()-0.5)*100,py+(Math.random()-0.5)*100);ctx.strokeStyle='rgba(58,240,240,0.08)';ctx.lineWidth=0.8;ctx.stroke();}}}else if(type===1){for(let r=0;r<9;r++)for(let a=0;a<360;a+=4){const rad=(r*16)*Math.PI/180+a*Math.PI/180,dist=r*16+Math.random()*6,bx=w/2+Math.cos(rad)*dist,by=h/2+Math.sin(rad)*dist;ctx.beginPath();ctx.arc(bx,by,Math.random()*2+0.5,0,Math.PI*2);ctx.fillStyle=a%3===0?`rgba(58,240,240,${Math.random()*0.8+0.2})`:a%3===1?`rgba(224,64,160,${Math.random()*0.7+0.2})`:`rgba(167,139,250,${Math.random()*0.6+0.2})`;ctx.fill();}}else if(type===2){ctx.lineWidth=1;for(let i=0;i<25;i++){ctx.strokeStyle=i%3===0?'rgba(58,240,240,0.3)':i%3===1?'rgba(224,64,160,0.25)':'rgba(167,139,250,0.2)';ctx.beginPath();let cx2=Math.random()*w,cy2=Math.random()*h;ctx.moveTo(cx2,cy2);for(let s=0;s<5;s++){Math.random()<0.5?cx2+=15+Math.random()*35:cy2+=15+Math.random()*35;ctx.lineTo(cx2,cy2);}ctx.stroke();ctx.beginPath();ctx.arc(cx2,cy2,2,0,Math.PI*2);ctx.fillStyle='rgba(58,240,240,0.6)';ctx.fill();}}else if(type===3){for(let i=0;i<250;i++){ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,Math.random()*1.5,0,Math.PI*2);const r=Math.random();ctx.fillStyle=r<0.4?`rgba(58,240,240,${Math.random()*0.6+0.1})`:r<0.7?`rgba(224,64,160,${Math.random()*0.6+0.1})`:`rgba(167,139,250,${Math.random()*0.5+0.1})`;ctx.fill();}}else if(type===4){ctx.strokeStyle='rgba(224,64,160,0.2)';ctx.lineWidth=2;ctx.strokeRect(12,12,w-24,h-24);ctx.fillStyle='rgba(224,64,160,0.05)';ctx.fillRect(12,12,w-24,h-24);ctx.fillStyle='rgba(240,238,255,0.12)';ctx.font=`bold ${w*0.09}px Satoshi,sans-serif`;ctx.textAlign='center';ctx.fillText('COMIC',w/2,h/2);ctx.font=`${w*0.045}px Satoshi,sans-serif`;ctx.fillStyle='rgba(224,64,160,0.3)';ctx.fillText('coming soon',w/2,h/2+24);}else{for(let i=0;i<70;i++){const px=Math.random()*w,py=Math.random()*h,rad=Math.random()*25+5;const g=ctx.createRadialGradient(px,py,0,px,py,rad);const usePink=Math.random()>0.5;g.addColorStop(0,`rgba(${usePink?'224,64,160':'58,240,240'},${Math.random()*0.2+0.05})`);g.addColorStop(1,'rgba(7,8,15,0)');ctx.beginPath();ctx.arc(px,py,rad,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();}}}
+[0,1,2,3,4,5].forEach(i=>makeGalleryArt(`gart${i+1}`,i));
+
+// ── PROJECT GLOW ──
+function trackMouse(e,card){const r=card.getBoundingClientRect();card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');card.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');}
+
+// ── NOW PLAYING ──
+const songs=[{title:'Hellfire',artist:'Arcane · Season 2',dur:204},{title:'Enemy',artist:'Imagine Dragons × J.I.D',dur:173},{title:'Guns For Hire',artist:'Woodkid · Arcane S2',dur:198},{title:'What Could Have Been',artist:'Sting · Arcane',dur:212},{title:'Paint The Town Blue',artist:'Niki · Arcane S2',dur:187},{title:'Dynasties & Dystopia',artist:'Arcane · Season 1',dur:196},{title:'Playground',artist:'Bea Miller · Arcane',dur:165},{title:'Bad Thing #41',artist:'Arcane · Season 2',dur:195},{title:'Get Jinxed',artist:'Arcane · Season 1',dur:193}];
+let cur=0,playing=true,elapsed=0,npTimer=null;
+function fmt(s){return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
+function drawNpArt(){const c=document.getElementById('art-canvas'),x=c.getContext('2d'),w=40,h=40;x.fillStyle='#0c0e1e';x.fillRect(0,0,w,h);for(let i=0;i<6;i++){const g=x.createRadialGradient(Math.random()*w,Math.random()*h,0,w/2,h/2,20);g.addColorStop(0,Math.random()>0.5?'rgba(58,240,240,0.5)':'rgba(224,64,160,0.5)');g.addColorStop(1,'transparent');x.beginPath();x.arc(Math.random()*w,Math.random()*h,12,0,Math.PI*2);x.fillStyle=g;x.fill();}x.beginPath();x.arc(20,20,8,0,Math.PI*2);x.strokeStyle='rgba(58,240,240,0.25)';x.lineWidth=1;x.stroke();x.beginPath();x.arc(20,20,2,0,Math.PI*2);x.fillStyle='rgba(224,64,160,0.9)';x.fill();}
+function loadSong(idx){const s=songs[idx];document.getElementById('np-song').textContent=s.title;document.getElementById('np-artist').textContent=s.artist;document.getElementById('np-dur').textContent=fmt(s.dur);document.getElementById('np-cur').textContent='0:00';document.getElementById('np-fill').style.width='0%';document.getElementById('player').style.setProperty('--prog','0%');elapsed=0;drawNpArt();}
+function npTick(){elapsed++;if(elapsed>=songs[cur].dur){cur=(cur+1)%songs.length;loadSong(cur);return;}document.getElementById('np-cur').textContent=fmt(elapsed);const pct=(elapsed/songs[cur].dur*100).toFixed(1)+'%';document.getElementById('np-fill').style.width=pct;document.getElementById('player').style.setProperty('--prog',pct);}
+function npPlay(){playing=true;document.getElementById('btn-play').textContent='⏸';npTimer=setInterval(npTick,1000);}
+function npPause(){playing=false;document.getElementById('btn-play').textContent='▶';clearInterval(npTimer);}
+document.getElementById('btn-play').addEventListener('click',()=>playing?npPause():npPlay());
+document.getElementById('btn-next').addEventListener('click',()=>{clearInterval(npTimer);cur=(cur+1)%songs.length;loadSong(cur);if(playing)npPlay();});
+document.getElementById('btn-prev').addEventListener('click',()=>{clearInterval(npTimer);cur=(cur-1+songs.length)%songs.length;loadSong(cur);if(playing)npPlay();});
+document.querySelector('.np-bar').addEventListener('click',e=>{const r=e.currentTarget.getBoundingClientRect();elapsed=Math.floor((e.clientX-r.left)/r.width*songs[cur].dur);document.getElementById('np-cur').textContent=fmt(elapsed);});
+loadSong(0);npPlay();
+
+// ── EASTER EGG ──
+let eggBuf='';
+document.addEventListener('keydown',e=>{eggBuf=(eggBuf+e.key).slice(-4);if(eggBuf.toLowerCase()==='isha')openEgg();});
+function openEgg(){document.getElementById('egg').classList.add('show');const ec=document.getElementById('egg-canvas'),ex=ec.getContext('2d');ec.width=window.innerWidth;ec.height=window.innerHeight;const eps=[];for(let i=0;i<300;i++)eps.push({x:Math.random()*ec.width,y:Math.random()*ec.height,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3,r:Math.random()*3+1,c:Math.random()<0.4?'58,240,240':Math.random()<0.7?'224,64,160':'167,139,250'});function animEgg(){ex.clearRect(0,0,ec.width,ec.height);eps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>ec.width)p.vx*=-1;if(p.y<0||p.y>ec.height)p.vy*=-1;ex.beginPath();ex.arc(p.x,p.y,p.r,0,Math.PI*2);ex.fillStyle=`rgba(${p.c},0.6)`;ex.fill();});if(document.getElementById('egg').classList.contains('show'))requestAnimationFrame(animEgg);}animEgg();}
+function closeEgg(){document.getElementById('egg').classList.remove('show');}
 </script>
 </body>
 </html>
