@@ -41,9 +41,11 @@ body {
   font-family: 'Darker Grotesque', sans-serif;
   background: var(--pink-soft);
   color: var(--ink);
-  overflow: hidden;
-  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
+
+.scroll-spacer { pointer-events: none; }
 
 ::selection { background: var(--pink); color: var(--ink); }
 
@@ -199,18 +201,13 @@ body {
 
 .gallery-wrap {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  height: 100vh;
   z-index: 1;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: auto;
   display: flex;
-  scroll-snap-type: x proximity;
+  will-change: transform;
 }
-
-.gallery-wrap::-webkit-scrollbar { height: 6px; }
-.gallery-wrap::-webkit-scrollbar-track { background: var(--pink-soft); }
-.gallery-wrap::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 3px; }
 
 .page {
   min-width: 100vw;
@@ -464,8 +461,8 @@ body {
 }
 
 @keyframes bounceR {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
 }
 
 /* Color bar across top of cover */
@@ -958,7 +955,7 @@ body {
       <p class="subtitle handwritten">engineer, analyst, and occasional artist</p>
       <div style="width:32px;height:2px;background:var(--pink-bright);margin:16px auto"></div>
       <p class="roles">AI Engineer &middot; Data Scientist &middot; Full Stack</p>
-      <p class="scroll-hint">scroll right to explore <span class="arrow">&rarr;</span></p>
+      <p class="scroll-hint">scroll down to explore <span class="arrow">&darr;</span></p>
     </div>
     <span class="page-num">pg. 1</span>
   </section>
@@ -1196,6 +1193,8 @@ body {
 
 </div>
 
+<div class="scroll-spacer" id="spacer"></div>
+
 <script>
 // ═══════════════════════════════════════
 // ZINE UNFOLD
@@ -1203,6 +1202,11 @@ body {
 const overlay = document.getElementById('zineOverlay');
 const zineCover = document.getElementById('zineCover');
 const gallery = document.getElementById('gallery');
+const spacer = document.getElementById('spacer');
+const progressBar = document.getElementById('progressBar');
+const roomTag = document.getElementById('roomTag');
+const pages = document.querySelectorAll('.page');
+const pageDots = document.getElementById('pageDots');
 
 zineCover.addEventListener('click', () => {
   zineCover.classList.add('opening');
@@ -1212,49 +1216,54 @@ zineCover.addEventListener('click', () => {
 });
 
 // ═══════════════════════════════════════
-// HORIZONTAL SCROLL — native overflow-x
-// Mouse wheel converts to horizontal scroll
+// SMOOTH HORIZONTAL SCROLL via vertical scrollY
+// Body scrolls vertically (normal mousewheel).
+// Fixed gallery track reads scrollY and translates left.
+// Spacer div creates the necessary scroll height.
 // ═══════════════════════════════════════
-gallery.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  gallery.scrollLeft += e.deltaY * 2.5;
-}, { passive: false });
 
-// Touch support
-let touchX = 0;
-gallery.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
-gallery.addEventListener('touchmove', e => {
-  const dx = touchX - e.touches[0].clientX;
-  gallery.scrollLeft += dx;
-  touchX = e.touches[0].clientX;
-}, { passive: true });
+function totalW() {
+  let w = 0;
+  pages.forEach(p => w += p.offsetWidth);
+  return w;
+}
 
-// Progress bar + room tag
-const progressBar = document.getElementById('progressBar');
-const roomTag = document.getElementById('roomTag');
-const pages = document.querySelectorAll('.page');
-const pageDots = document.getElementById('pageDots');
+function setup() {
+  const tw = totalW();
+  spacer.style.height = (tw - window.innerWidth + window.innerHeight) + 'px';
+}
 
-// Create dots
+// Build dots
 pages.forEach((_, i) => {
   const btn = document.createElement('button');
   if (i === 0) btn.classList.add('active');
   btn.addEventListener('click', () => {
-    pages[i].scrollIntoView({ behavior: 'smooth', inline: 'start' });
+    // Calculate scroll position for this page
+    let offset = 0;
+    for (let j = 0; j < i; j++) offset += pages[j].offsetWidth;
+    const maxX = totalW() - window.innerWidth;
+    const maxY = document.documentElement.scrollHeight - window.innerHeight;
+    const targetY = maxX > 0 ? (offset / maxX) * maxY : 0;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
   });
   pageDots.appendChild(btn);
 });
 
 const dots = pageDots.querySelectorAll('button');
 
-function updateUI() {
-  const maxScroll = gallery.scrollWidth - gallery.clientWidth;
-  const frac = maxScroll > 0 ? gallery.scrollLeft / maxScroll : 0;
+let ticking = false;
+function onScroll() {
+  const maxX = totalW() - window.innerWidth;
+  const maxY = document.documentElement.scrollHeight - window.innerHeight;
+  const frac = maxY > 0 ? window.scrollY / maxY : 0;
+  const tx = frac * maxX;
+
+  gallery.style.transform = `translateX(-${tx}px)`;
   progressBar.style.width = (frac * 100) + '%';
 
   // Find current page
   let currentIdx = 0;
-  const center = gallery.scrollLeft + gallery.clientWidth * 0.4;
+  const center = tx + window.innerWidth * 0.4;
   let acc = 0;
   for (let i = 0; i < pages.length; i++) {
     acc += pages[i].offsetWidth;
@@ -1265,15 +1274,17 @@ function updateUI() {
   dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
 }
 
-gallery.addEventListener('scroll', () => {
-  requestAnimationFrame(updateUI);
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => { onScroll(); ticking = false; });
+    ticking = true;
+  }
 }, { passive: true });
 
-// Keyboard
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight') gallery.scrollLeft += window.innerWidth * 0.6;
-  if (e.key === 'ArrowLeft') gallery.scrollLeft -= window.innerWidth * 0.6;
-});
+window.addEventListener('resize', () => { setup(); onScroll(); });
+
+setup();
+onScroll();
 
 // ═══════════════════════════════════════
 // CANVAS ANIMATIONS
@@ -1301,7 +1312,7 @@ document.querySelectorAll('.fc').forEach(c => {
   })();
 });
 
-updateUI();
+onScroll();
 </script>
 </body>
 </html>
